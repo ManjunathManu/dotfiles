@@ -32,4 +32,4 @@ bind l select-pane -R
 ### Color & Style Settings ###
 ##############################
 
-source ~/Documents/projects/trial-projects/dotfiles/tmux/theme.sh
+source ~/Documents/projects/dotfiles/tmux/theme.sh

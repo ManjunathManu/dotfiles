@@ -1,12 +1,13 @@
 #!/bin/bash
 
-DOTFILES=$HOME/Documents/projects/trial-projects/dotfiles
+DOTFILES=$HOME/Documents/projects/dotfiles
 
 echo -e "\\nCreating symlinks"
 echo "=============================="
 linkables=$( find -H "$DOTFILES" -maxdepth 3 -name '*.symlink' )
 for file in $linkables ; do
     target="$HOME/.$( basename "$file" '.symlink' )"
+    echo "$target"
     if [ -e "$target" ]; then
         # echo "~${target#$HOME} already exists... Skipping."
    	echo "~${target#$HOME} already exists... Deleting"
@@ -18,7 +19,8 @@ for file in $linkables ; do
         ln -s "$file" "$target"
     fi
 done
-
+echo "=============================="
+:<< END
 echo -e "\\n\\ninstalling to ~/.config"
 echo "=============================="
 if [ ! -d "$HOME/.config" ]; then
@@ -37,24 +39,20 @@ for config in $config_files; do
     fi
 done
 
-# create vim symlinks
-# As I have moved off of vim as my full time editor in favor of neovim,
-# I feel it doesn't make sense to leave my vimrc intact in the dotfiles repo
-# as it is not really being actively maintained. However, I would still
-# like to configure vim, so lets symlink ~/.vimrc and ~/.vim over to their
-# neovim equivalent.
 
-: <<'END'
 echo -e "\\n\\nCreating vim symlinks"
 echo "=============================="
-VIMFILES=( "$HOME/.vim:$DOTFILES/config/nvim"
-        "$HOME/.vimrc:$DOTFILES/config/nvim/init.vim" )
+VIMFILES=("$HOME/.vimrc:$DOTFILES/vim/init.vim" )
 
 for file in "${VIMFILES[@]}"; do
     KEY=${file%%:*}
     VALUE=${file#*:}
     if [ -e "${KEY}" ]; then
-        echo "${KEY} already exists... skipping."
+        # echo "${KEY} already exists... skipping."
+
+   	echo "~${KEY} already exists... Deleting"
+	rm "$KEY"
+        ln -s "${VALUE}" "${KEY}"
     else
         echo "Creating symlink for $KEY"
         ln -s "${VALUE}" "${KEY}"

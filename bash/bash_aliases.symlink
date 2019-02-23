@@ -1,0 +1,32 @@
+# Change to projects directory
+alias cdp='cd ~/Documents/projects'
+alias ..='cd ..'
+# Create a new directory and enter it
+function mkd() { 
+    mkdir -p "$@" && cd "$_";
+}
+#*****************TMUX*******************
+# Start tmux
+function tx(){
+ source "$HOME/Documents/projects/dotfiles/bin/tm"
+}
+alias tmux='tmux -u'
+# Kill tmux session
+alias tks='tmux kill-session'
+# List all tmux sessions
+alias tls='tmux list-sessions'
+
+#****************GIT*************************
+alias gs='git status'
+
+#*****************JS*************************
+alias nrl='npm run local'
+
+#*****************VIM************************
+alias vimrc='vim ~/.vimrc'
+alias brc='vim ~/.bashrc'
+alias tmuxconf='vim ~/.tmux.conf'
+alias baliases='vim ~/.bash_aliases'
+
+# Reload bashrc
+alias rbash='source ~/.bashrc'
