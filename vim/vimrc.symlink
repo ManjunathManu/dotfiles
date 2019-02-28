@@ -10,32 +10,64 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
-Plugin 'scrooloose/syntastic'
-Plugin 'kien/ctrlp.vim'
+Plugin 'w0rp/ale'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'tpope/vim-surround'
+Plugin 'gko/vim-coloresque'
+Plugin 'leafgarland/typescript-vim'
+Plugin 'valloric/youcompleteme'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 
+" Change leader key to <space>
+let mapleader=" "
 set number
 set relativenumber
 set ttimeoutlen=10
-
+set mouse=a
+set tabstop=2 shiftwidth=2 expandtab
+:highlight Normal ctermfg=black ctermbg=white
+"Ignore node_modules folder in vimgrep search
+set wildignore+=**/node_modules/**
 " air-line
 let g:airline_powerline_fonts = 1
 
 " Nerd-tree
-autocmd vimenter * NERDTree
+" autocmd vimenter * NERDTree " Open nerd tree by default
+nmap <F6> :NERDTreeToggle<CR>
+nmap <leader>d <Plug>(ale_go_to_definition)
+nmap <leader>f <Plug>(ale_fix)
+nmap <leader>r <Plug>(ale_find_references)
+nmap <leader>h <Plug>(ale_hover)
+let g:NERDTreeMouseMode=3
+
+" Ctrl p
+let g:ctrlp_custom_ignore = 'node_modules' " Exclude node_modules during search
+
+autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
+
+if !exists("g:ycm_semantic_triggers")
+   let g:ycm_semantic_triggers = {}
+endif
+let g:ycm_semantic_triggers['typescript'] = ['.']
+set completeopt-=preview
+
+" ALE
+let g:ale_fixers = {
+      \   '*': ['remove_trailing_lines', 'trim_whitespace'],
+      \   'javascript': ['eslint'],
+      \   'typescript': ['tslint'],
+      \   'html': ['tidy'],
+      \ }
+
+" Set this variable to 1 to fix files when you save them.
+let g:ale_fix_on_save = 1
+" Dont run linter on text change
+let g:ale_lint_on_text_changed = 'never'
+" Enable completion where available.
+" This setting must be set before ALE is loaded.
+" let g:ale_completion_enabled = 1
