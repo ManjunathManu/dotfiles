@@ -18,6 +18,7 @@ Plugin 'tpope/vim-surround'
 Plugin 'gko/vim-coloresque'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'valloric/youcompleteme'
+Plugin 'scrooloose/nerdcommenter'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -33,19 +34,23 @@ set tabstop=2 shiftwidth=2 expandtab
 :highlight Normal ctermfg=black ctermbg=white
 "Ignore node_modules folder in vimgrep search
 set wildignore+=**/node_modules/**
-" air-line
+
+" ******************** air-line ********************
 let g:airline_powerline_fonts = 1
 
-" Nerd-tree
+" ******************** Nerd-tree ********************
 " autocmd vimenter * NERDTree " Open nerd tree by default
-nmap <F6> :NERDTreeToggle<CR>
+nmap <F6> :NERDTreeToggle<CR> " Toggle nerd tree
+nmap <F7> :NERDTreeFind<CR> " Reveal current file in nerd tree
+
+" ******************** ALE ********************
 nmap <leader>d <Plug>(ale_go_to_definition)
 nmap <leader>f <Plug>(ale_fix)
 nmap <leader>r <Plug>(ale_find_references)
 nmap <leader>h <Plug>(ale_hover)
 let g:NERDTreeMouseMode=3
 
-" Ctrl p
+" ******************** Ctrl p ********************
 let g:ctrlp_custom_ignore = 'node_modules' " Exclude node_modules during search
 
 autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
@@ -56,12 +61,14 @@ endif
 let g:ycm_semantic_triggers['typescript'] = ['.']
 set completeopt-=preview
 
-" ALE
+" ************************* ALE *********************************
 let g:ale_fixers = {
       \   '*': ['remove_trailing_lines', 'trim_whitespace'],
       \   'javascript': ['eslint'],
       \   'typescript': ['tslint'],
-      \   'html': ['tidy'],
+      \   'html': ['htmlhint'],
+      \   'css': ['prettier'],
+      \   'scss': ['prettier']
       \ }
 
 " Set this variable to 1 to fix files when you save them.
@@ -71,3 +78,7 @@ let g:ale_lint_on_text_changed = 'never'
 " Enable completion where available.
 " This setting must be set before ALE is loaded.
 " let g:ale_completion_enabled = 1
+
+" ******************* NERD Commenter *******************************
+" Add spaces after comment delimiters by default
+ let g:NERDSpaceDelims = 1
