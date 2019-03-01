@@ -31,7 +31,15 @@ set relativenumber
 set ttimeoutlen=10
 set mouse=a
 set tabstop=2 shiftwidth=2 expandtab
+:imap jj <Esc> " Press jj to exit insert mode 
 :highlight Normal ctermfg=black ctermbg=white
+inoremap " ""<left>
+inoremap ' ''<left>
+inoremap ( ()<left>
+inoremap [ []<left>
+inoremap { {}<left>
+inoremap {<CR> {<CR>}<ESC>O
+inoremap {;<CR> {<CR>};<ESC>O
 "Ignore node_modules folder in vimgrep search
 set wildignore+=**/node_modules/**
 
@@ -42,12 +50,6 @@ let g:airline_powerline_fonts = 1
 " autocmd vimenter * NERDTree " Open nerd tree by default
 nmap <F6> :NERDTreeToggle<CR> " Toggle nerd tree
 nmap <F7> :NERDTreeFind<CR> " Reveal current file in nerd tree
-
-" ******************** ALE ********************
-nmap <leader>d <Plug>(ale_go_to_definition)
-nmap <leader>f <Plug>(ale_fix)
-nmap <leader>r <Plug>(ale_find_references)
-nmap <leader>h <Plug>(ale_hover)
 let g:NERDTreeMouseMode=3
 
 " ******************** Ctrl p ********************
@@ -62,6 +64,10 @@ let g:ycm_semantic_triggers['typescript'] = ['.']
 set completeopt-=preview
 
 " ************************* ALE *********************************
+nmap <leader>d <Plug>(ale_go_to_definition)
+nmap <leader>f <Plug>(ale_fix)
+nmap <leader>r <Plug>(ale_find_references)
+nmap <leader>h <Plug>(ale_hover)
 let g:ale_fixers = {
       \   '*': ['remove_trailing_lines', 'trim_whitespace'],
       \   'javascript': ['eslint'],

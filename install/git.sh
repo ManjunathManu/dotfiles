@@ -8,14 +8,17 @@ printf "Setting up Git...\\n\\n"
 defaultName=$( git config --global user.name )
 defaultEmail=$( git config --global user.email )
 defaultGithub=$( git config --global github.user )
+defaultGitEditor=$( git config --global core.editor )
 
 read -rp "Name [$defaultName] " name
 read -rp "Email [$defaultEmail] " email
 read -rp "Github username [$defaultGithub] " github
+read -rp "Default Git Editor [$defaultGitEditor] " editor
 
 git config --global user.name "${name:-$defaultName}"
 git config --global user.email "${email:-$defaultEmail}"
 git config --global github.user "${github:-$defaultGithub}"
+git config --global core.editor "${editor:-$defaultGitEditor}"
 
 if [[ "$( uname )" == "Darwin" ]]; then
     git config --global credential.helper "osxkeychain"
