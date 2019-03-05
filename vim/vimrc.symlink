@@ -24,15 +24,19 @@ call vundle#end()            " required
 filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
-" Change leader key to <space>
-let mapleader=" "
+" ******************** VIM Options ********************
+let mapleader=" " " Change leader key to <space>
 set number
 set relativenumber
 set ttimeoutlen=10
 set mouse=a
 set tabstop=2 shiftwidth=2 expandtab
-:imap jj <Esc> " Press jj to exit insert mode 
 :highlight Normal ctermfg=black ctermbg=white
+set wildignore+=**/node_modules/** "Ignore node_modules folder in vimgrep search
+
+" ******************** Key Binding ********************
+:imap jj <Esc> " Press jj to exit insert mode
+" Auto Complete quotes and parens
 inoremap " ""<left>
 inoremap ' ''<left>
 inoremap ( ()<left>
@@ -40,8 +44,17 @@ inoremap [ []<left>
 inoremap { {}<left>
 inoremap {<CR> {<CR>}<ESC>O
 inoremap {;<CR> {<CR>};<ESC>O
-"Ignore node_modules folder in vimgrep search
-set wildignore+=**/node_modules/**
+
+" Cause > to autocomplete tag
+" ><CR> to auotcomplete and put cursor in new line
+" ><Leader> to cancel autocompletion for this time
+" Only in HTML, JavaScript and XML files
+function s:CompleteTags()
+  inoremap <buffer> > ></<C-x><C-o><Esc>:startinsert!<CR><C-O>?</<CR>
+  inoremap <buffer> ><Leader> >
+  inoremap <buffer> ><CR> ></<C-x><C-o><Esc>:startinsert!<CR><C-O>?</<CR><CR><Tab><CR><Up><C-O>$
+endfunction
+autocmd BufRead,BufNewFile *.html,*.js,*.xml call s:CompleteTags()
 
 " ******************** air-line ********************
 let g:airline_powerline_fonts = 1
@@ -58,7 +71,7 @@ let g:ctrlp_custom_ignore = 'node_modules' " Exclude node_modules during search
 autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 
 if !exists("g:ycm_semantic_triggers")
-   let g:ycm_semantic_triggers = {}
+  let g:ycm_semantic_triggers = {}
 endif
 let g:ycm_semantic_triggers['typescript'] = ['.']
 set completeopt-=preview
@@ -80,11 +93,11 @@ let g:ale_fixers = {
 " Set this variable to 1 to fix files when you save them.
 let g:ale_fix_on_save = 1
 " Dont run linter on text change
-let g:ale_lint_on_text_changed = 'never'
+" let g:ale_lint_on_text_changed = 'never'
 " Enable completion where available.
 " This setting must be set before ALE is loaded.
 " let g:ale_completion_enabled = 1
 
 " ******************* NERD Commenter *******************************
 " Add spaces after comment delimiters by default
- let g:NERDSpaceDelims = 1
+let g:NERDSpaceDelims = 1

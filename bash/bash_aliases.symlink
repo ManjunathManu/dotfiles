@@ -18,7 +18,8 @@ alias tls='tmux list-sessions'
 
 #****************GIT*************************
 alias gs='git status'
-
+alias gpr='git pull -r'
+alias gl='git log --pretty --graph'
 #*****************JS*************************
 alias nrl='npm run local'
 
