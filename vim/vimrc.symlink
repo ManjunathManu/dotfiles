@@ -33,7 +33,7 @@ set mouse=a
 set tabstop=2 shiftwidth=2 expandtab
 :highlight Normal ctermfg=black ctermbg=white
 set wildignore+=**/node_modules/** "Ignore node_modules folder in vimgrep search
-
+set foldmethod=indent
 " ******************** Key Binding ********************
 :imap jj <Esc> " Press jj to exit insert mode
 " Auto Complete quotes and parens
@@ -56,6 +56,10 @@ function s:CompleteTags()
 endfunction
 autocmd BufRead,BufNewFile *.html,*.js,*.xml call s:CompleteTags()
 
+if has('persistent_undo')      "check if your vim version supports it
+  set undofile                 "turn on the feature  
+  set undodir=$HOME/.vim/undo  "directory where the undo files will be stored
+endif
 " ******************** air-line ********************
 let g:airline_powerline_fonts = 1
 
@@ -77,7 +81,7 @@ let g:ycm_semantic_triggers['typescript'] = ['.']
 set completeopt-=preview
 
 " ************************* ALE *********************************
-nmap <leader>d <Plug>(ale_go_to_definition)
+nmap <leader>d <Plug>(ale_go_to_definition_in_split)
 nmap <leader>f <Plug>(ale_fix)
 nmap <leader>r <Plug>(ale_find_references)
 nmap <leader>h <Plug>(ale_hover)
