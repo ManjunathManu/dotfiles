@@ -8,7 +8,7 @@ setw -g mode-keys vi
 
 # reload config file
 bind r source-file ~/.tmux.conf \; display "Config Reloaded!"
-
+bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
 # Mouse support - set to on if you want to use the mouse
 set -g mouse on
 
@@ -33,3 +33,11 @@ bind l select-pane -R
 ##############################
 
 source ~/Documents/projects/dotfiles/tmux/theme.sh
+
+#########################TMP Plugins##################
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-battery'
+set -g @plugin 'tmux-plugins/tmux-cpu'
+
+# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+run -b '~/.tmux/plugins/tpm/tpm'

@@ -5,6 +5,7 @@ tm_color_inactive=colour241
 tm_color_feature=colour206
 tm_color_music=colour215
 tm_active_border_color=colour240
+tm_color_white=colour231
 
 # separators
 tm_separator_left_bold="◀"
@@ -17,7 +18,7 @@ set -g status-right-length 150
 set -g status-interval 5
 
 # default statusbar colors
-# set-option -g status-bg colour0
+# set-option -g status-bg colour129
 set-option -g status-fg $tm_color_active
 set-option -g status-bg default
 set-option -g status-attr default
@@ -47,14 +48,19 @@ set-option -g display-panes-colour $tm_color_inactive
 # clock
 set-window-option -g clock-mode-colour $tm_color_active
 
-# tm_tunes="#[fg=$tm_color_music]#(osascript ~/.dotfiles/applescripts/tunes.scpt | cut -c 1-50)"
-# tm_tunes="#[fg=$tm_color_music]#(osascript -l JavaScript ~/.dotfiles/applescripts/tunes.js)"
-# tm_battery="#(~/.dotfiles/bin/battery_indicator.sh)"
+#Battery
+set -g @batt_remain_short true
 
-tm_date="#[fg=$tm_color_inactive] %R %d %b"
+tm_date_utc="#(date --utc +%Y-%m-%dT%%H:%%M:%%SZ) |"
+tm_date_ist="#(TZ=Asia/Kolkata date +%d/%m/%Y,' '%%H:%%M:%%S) IST ::"
+tm_date="#[fg=$tm_color_white] $tm_date_ist $tm_date_utc"
+
 tm_host="#[fg=$tm_color_feature,bold]#h"
 tm_session_name="#[fg=$tm_color_feature,bold]#S"
 
-set -g status-left $tm_session_name' '
-set -g status-right $tm_tunes' '$tm_date' '$tm_host
+tm_cpu="#{cpu_fg_color}CPU: #{cpu_icon} #{cpu_percentage} |"
+tm_battery="#{battery_status_fg}Batt: #{battery_icon} #{battery_percentage} #{battery_remain} |"
+tm_current_path="#[fg=$tm_color_music]#{pane_current_path} |"
 
+set -g status-left $tm_session_name' '
+set -g status-right $tm_cpu' '$tm_battery' '$tm_date' '$tm_host

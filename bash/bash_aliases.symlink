@@ -2,9 +2,10 @@
 alias cdp='cd ~/Documents/projects'
 alias ..='cd ..'
 # Create a new directory and enter it
-function mkd() { 
+function mkd() {
     mkdir -p "$@" && cd "$_";
 }
+alias editor='~/editor.sh';
 #*****************TMUX*******************
 # Start tmux
 function tx(){
@@ -20,6 +21,7 @@ alias tls='tmux list-sessions'
 alias gs='git status'
 alias gpr='git pull -r'
 alias gl='git log --pretty --graph'
+alias glo='git log --pretty --graph --oneline'
 #*****************JS*************************
 alias nrl='npm run local'
 
@@ -28,6 +30,10 @@ alias vimrc='vim ~/.vimrc'
 alias brc='vim ~/.bashrc'
 alias tmuxconf='vim ~/.tmux.conf'
 alias baliases='vim ~/.bash_aliases'
+
+#***********DOCKER**********
+alias doccouchbase='docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase/server'
+alias docsyncgateway='docker run -p 4984:4984 -d couchbase/sync-gateway'
 
 # Reload bashrc
 alias rbash='source ~/.bashrc'

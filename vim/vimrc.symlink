@@ -1,6 +1,6 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
-
+syntax on
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -19,6 +19,11 @@ Plugin 'gko/vim-coloresque'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'valloric/youcompleteme'
 Plugin 'scrooloose/nerdcommenter'
+Plugin 'ryanoasis/vim-devicons'
+Plugin 'tomasiser/vim-code-dark'
+Plugin 'heavenshell/vim-jsdoc'
+Plugin 'lifepillar/vim-solarized8'
+Plugin 'mattn/emmet-vim'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -28,12 +33,18 @@ filetype plugin indent on    " required
 let mapleader=" " " Change leader key to <space>
 set number
 set relativenumber
+set background=light
+colorscheme solarized8_high
 set ttimeoutlen=10
 set mouse=a
+set encoding=UTF-8
 set tabstop=2 shiftwidth=2 expandtab
-:highlight Normal ctermfg=black ctermbg=white
-set wildignore+=**/node_modules/** "Ignore node_modules folder in vimgrep search
+" :highlight Normal ctermfg=black ctermbg=white
+set wildignore+=**/node_modules/**,**/documentation/** "Ignore node_modules and documentation folder in vimgrep search
 set foldmethod=indent
+set t_Co=256
+set t_ut=
+" let solarized_visibility="high"
 " ******************** Key Binding ********************
 :imap jj <Esc> " Press jj to exit insert mode
 " Auto Complete quotes and parens
@@ -57,17 +68,22 @@ endfunction
 autocmd BufRead,BufNewFile *.html,*.js,*.xml call s:CompleteTags()
 
 if has('persistent_undo')      "check if your vim version supports it
-  set undofile                 "turn on the feature  
+  set undofile                 "turn on the feature
   set undodir=$HOME/.vim/undo  "directory where the undo files will be stored
 endif
+
+
 " ******************** air-line ********************
 let g:airline_powerline_fonts = 1
+let g:airline_theme = 'codedark'
+let g:typescript_ignore_typescriptdoc = 1
 
 " ******************** Nerd-tree ********************
 " autocmd vimenter * NERDTree " Open nerd tree by default
 nmap <F6> :NERDTreeToggle<CR> " Toggle nerd tree
 nmap <F7> :NERDTreeFind<CR> " Reveal current file in nerd tree
 let g:NERDTreeMouseMode=3
+
 
 " ******************** Ctrl p ********************
 let g:ctrlp_custom_ignore = 'node_modules' " Exclude node_modules during search
@@ -80,6 +96,7 @@ endif
 let g:ycm_semantic_triggers['typescript'] = ['.']
 set completeopt-=preview
 
+
 " ************************* ALE *********************************
 nmap <leader>d <Plug>(ale_go_to_definition_in_split)
 nmap <leader>f <Plug>(ale_fix)
@@ -89,7 +106,7 @@ let g:ale_fixers = {
       \   '*': ['remove_trailing_lines', 'trim_whitespace'],
       \   'javascript': ['eslint'],
       \   'typescript': ['tslint'],
-      \   'html': ['htmlhint'],
+      \   'html': ['prettier'],
       \   'css': ['prettier'],
       \   'scss': ['prettier']
       \ }
@@ -102,6 +119,17 @@ let g:ale_fix_on_save = 1
 " This setting must be set before ALE is loaded.
 " let g:ale_completion_enabled = 1
 
+
 " ******************* NERD Commenter *******************************
 " Add spaces after comment delimiters by default
 let g:NERDSpaceDelims = 1
+
+" ********************JS DOC ***************************************
+nmap <silent> <C-l> <Plug>(jsdoc)
+
+"search for the last function declaration and puts your jsdoc above it
+nmap <silent> <C-l> ?function<cr>:noh<cr><Plug>(jsdoc)
+
+"********************EMMET********************
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
