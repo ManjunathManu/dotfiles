@@ -15,36 +15,48 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'w0rp/ale'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'tpope/vim-surround'
-Plugin 'gko/vim-coloresque'
-Plugin 'leafgarland/typescript-vim'
+Plugin 'gko/vim-coloresque' "CSS/SASS/html color preview
+Plugin 'leafgarland/typescript-vim' " typescript syntax highlighter
 Plugin 'valloric/youcompleteme'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'ryanoasis/vim-devicons'
-Plugin 'tomasiser/vim-code-dark'
+Plugin 'scrooloose/nerdcommenter' " Vim plugin for intensely orgasmic commenting
+Plugin 'ryanoasis/vim-devicons' " Adds file type glyphs/icons to popular Vim plugins: NERDTree, vim-airline, Powerline, Unite, vim-startify and more
+Plugin 'tomasiser/vim-code-dark' " Theme
 Plugin 'heavenshell/vim-jsdoc'
 Plugin 'lifepillar/vim-solarized8'
 Plugin 'mattn/emmet-vim'
+Plugin 'pangloss/vim-javascript' " Javascript syntax highlighting
+" Plugin 'prettier/vim-prettier', { 'do': 'npm install' }
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
+
 " ******************** VIM Options ********************
 let mapleader=" " " Change leader key to <space>
 set number
 set relativenumber
-set background=light
+set background=dark
+set signcolumn=yes
 colorscheme solarized8_high
+" colorscheme codedark
 set ttimeoutlen=10
 set mouse=a
 set encoding=UTF-8
 set tabstop=2 shiftwidth=2 expandtab
-" :highlight Normal ctermfg=black ctermbg=white
+" :highlight Normal ctermfg=white ctermbg=black
 set wildignore+=**/node_modules/**,**/documentation/** "Ignore node_modules and documentation folder in vimgrep search
 set foldmethod=indent
 set t_Co=256
 set t_ut=
-" let solarized_visibility="high"
+let solarized_visibility="high"
+" Remove white space in git diff
+set diffopt+=iwhite
+set diffexpr=""
+set pastetoggle=<F3>
+set ignorecase
+" set hlsearch
+
 " ******************** Key Binding ********************
 :imap jj <Esc> " Press jj to exit insert mode
 " Auto Complete quotes and parens
@@ -55,17 +67,19 @@ inoremap [ []<left>
 inoremap { {}<left>
 inoremap {<CR> {<CR>}<ESC>O
 inoremap {;<CR> {<CR>};<ESC>O
-
+" nnoremap <esc><esc> :silent! nohls<cr>
+" Replace current word under the cursor
+:nnoremap <Leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
 " Cause > to autocomplete tag
 " ><CR> to auotcomplete and put cursor in new line
 " ><Leader> to cancel autocompletion for this time
-" Only in HTML, JavaScript and XML files
+" Only in HTML and XML files
 function s:CompleteTags()
   inoremap <buffer> > ></<C-x><C-o><Esc>:startinsert!<CR><C-O>?</<CR>
   inoremap <buffer> ><Leader> >
   inoremap <buffer> ><CR> ></<C-x><C-o><Esc>:startinsert!<CR><C-O>?</<CR><CR><Tab><CR><Up><C-O>$
 endfunction
-autocmd BufRead,BufNewFile *.html,*.js,*.xml call s:CompleteTags()
+autocmd BufRead,BufNewFile *.html,*.xml call s:CompleteTags()
 
 if has('persistent_undo')      "check if your vim version supports it
   set undofile                 "turn on the feature
@@ -78,12 +92,12 @@ let g:airline_powerline_fonts = 1
 let g:airline_theme = 'codedark'
 let g:typescript_ignore_typescriptdoc = 1
 
+
 " ******************** Nerd-tree ********************
 " autocmd vimenter * NERDTree " Open nerd tree by default
 nmap <F6> :NERDTreeToggle<CR> " Toggle nerd tree
 nmap <F7> :NERDTreeFind<CR> " Reveal current file in nerd tree
 let g:NERDTreeMouseMode=3
-
 
 " ******************** Ctrl p ********************
 let g:ctrlp_custom_ignore = 'node_modules' " Exclude node_modules during search
@@ -106,11 +120,9 @@ let g:ale_fixers = {
       \   '*': ['remove_trailing_lines', 'trim_whitespace'],
       \   'javascript': ['eslint'],
       \   'typescript': ['tslint'],
-      \   'html': ['prettier'],
       \   'css': ['prettier'],
-      \   'scss': ['prettier']
+      \   'scss': ['prettier'],
       \ }
-
 " Set this variable to 1 to fix files when you save them.
 let g:ale_fix_on_save = 1
 " Dont run linter on text change
@@ -118,11 +130,16 @@ let g:ale_fix_on_save = 1
 " Enable completion where available.
 " This setting must be set before ALE is loaded.
 " let g:ale_completion_enabled = 1
+let g:ale_sign_column_always = 1
+let g:ale_sign_error = '>>'
+let g:ale_sign_warning = '--'
 
-
+nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <C-j> <Plug>(ale_next_wrap)
 " ******************* NERD Commenter *******************************
 " Add spaces after comment delimiters by default
 let g:NERDSpaceDelims = 1
+
 
 " ********************JS DOC ***************************************
 nmap <silent> <C-l> <Plug>(jsdoc)
@@ -130,6 +147,21 @@ nmap <silent> <C-l> <Plug>(jsdoc)
 "search for the last function declaration and puts your jsdoc above it
 nmap <silent> <C-l> ?function<cr>:noh<cr><Plug>(jsdoc)
 
+
 "********************EMMET********************
 let g:user_emmet_install_global = 0
 autocmd FileType html,css EmmetInstall
+
+"********************VIM javascript(Syntax highlight)********************
+let g:javascript_plugin_jsdoc = 1
+let g:javascript_plugin_ngdoc = 1
+
+"********************Prettier********************
+" let g:prettier#autoformat = 0
+" autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue PrettierAsync
+" " put > on the last line instead of new line
+" " Prettier default: false
+" let g:prettier#config#jsx_bracket_same_line = 'true'
+" " single quotes over double quotes
+" " Prettier default: false
+" let g:prettier#config#single_quote = 'true'

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOTFILES=$HOME/Documents/projects/dotfiles
+DOTFILES=$HOME/workspace/source-code/personal/dotfiles
 
 echo -e "\\nCreating symlinks"
 echo "=============================="

@@ -51,7 +51,7 @@ set-window-option -g clock-mode-colour $tm_color_active
 #Battery
 set -g @batt_remain_short true
 
-tm_date_utc="#(date --utc +%Y-%m-%dT%%H:%%M:%%SZ) |"
+tm_date_utc="#(date --utc +%Y-%m-%dT%%H:%%M:%%SZ)"
 tm_date_ist="#(TZ=Asia/Kolkata date +%d/%m/%Y,' '%%H:%%M:%%S) IST ::"
 tm_date="#[fg=$tm_color_white] $tm_date_ist $tm_date_utc"
 
@@ -63,4 +63,4 @@ tm_battery="#{battery_status_fg}Batt: #{battery_icon} #{battery_percentage} #{ba
 tm_current_path="#[fg=$tm_color_music]#{pane_current_path} |"
 
 set -g status-left $tm_session_name' '
-set -g status-right $tm_cpu' '$tm_battery' '$tm_date' '$tm_host
+set -g status-right $tm_cpu' '$tm_battery' '$tm_date' '
