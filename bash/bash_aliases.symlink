@@ -1,52 +1,83 @@
 # Change to projects directory
 alias work='cd ~/workspace/source-code/lightmetrics'
+
 alias ..='cd ..'
+
 # Create a new directory and enter it
 function mkd() {
     mkdir -p "$@" && cd "$_";
 }
+
 alias editor='~/editor.sh';
+
 #*****************TMUX*******************
+
 # Start tmux
 function tx(){
  source "$HOME/workspace/source-code/personal/dotfiles/bin/tm"
 }
+
 alias tmux='tmux -u'
+
 # Kill tmux session
 alias tks='tmux kill-session'
+
 # List all tmux sessions
 alias tls='tmux list-sessions'
 
 #****************GIT*************************
+
 alias gs='git status'
+
 alias gpr='git pull -r'
+
 alias gl='git log --pretty --graph'
+
 alias glo='git log --pretty --graph --oneline'
+
 #*****************JS*************************
+
 alias nrl='npm run local'
 
 #*****************VIM************************
+
 alias vimrc='vim ~/.vimrc'
+
 alias brc='vim ~/.bashrc'
+
 alias tmuxconf='vim ~/.tmux.conf'
+
 alias baliases='vim ~/.bash_aliases'
 
 #*********************DOCKER********************
+
 alias doccouchbase='docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase/server'
+
 alias docsyncgateway='docker run -p 4984:4984 -d couchbase/sync-gateway'
 
 # ********************Nginx******************************
+
 alias nginx-start="sudo systemctl start nginx"
+
 alias nginx-stop="sudo systemctl stop nginx"
+
 alias nginx-restart="sudo systemctl restart nginx"
+
 alias nginx-status="systemctl status nginx"
+
 alias nginx-reload="sudo systemctl reload nginx"
 
 alias nginx-vim-default="sudo vim /etc/nginx/sites-available/default"
+
 alias nginx-vim-nginx.conf="sudo vim /etc/nginx/nginx.conf"
+
 alias nginx-tail-error.log="sudo tail -f -n200 /var/log/nginx/error.log"
+
 alias nginx-tail-access.log="sudo tail -f -n200 /var/log/nginx/access.log"
+
 alias nginx-cd-nginx.conf="cd /etc/nginx/"
+
 alias nginx-verify-config="sudo nginx -t"
+
 # Reload bashrc
 alias rbash='source ~/.bashrc'

@@ -53,9 +53,11 @@ set -g @batt_remain_short true
 
 tm_date_utc="#(date --utc +%Y-%m-%dT%%H:%%M:%%SZ)"
 tm_date_ist="#(TZ=Asia/Kolkata date +%d/%m/%Y,' '%%H:%%M:%%S) IST ::"
-tm_date="#[fg=$tm_color_white] $tm_date_ist $tm_date_utc"
+# tm_date="#[fg=$tm_color_white] $tm_date_ist $tm_date_utc"
+tm_date="#[fg=$tm_color_white] $tm_date_utc"
 
 tm_host="#[fg=$tm_color_feature,bold]#h"
+tm_ip="#(hostname -I | awk '{print $1}') ::"
 tm_session_name="#[fg=$tm_color_feature,bold]#S"
 
 tm_cpu="#{cpu_fg_color}CPU: #{cpu_icon} #{cpu_percentage} |"
@@ -63,4 +65,4 @@ tm_battery="#{battery_status_fg}Batt: #{battery_icon} #{battery_percentage} #{ba
 tm_current_path="#[fg=$tm_color_music]#{pane_current_path} |"
 
 set -g status-left $tm_session_name' '
-set -g status-right $tm_cpu' '$tm_battery' '$tm_date' '
+set -g status-right $tm_ip' '$tm_cpu' '$tm_battery' '$tm_date' '
