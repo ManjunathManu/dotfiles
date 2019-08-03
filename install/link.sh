@@ -1,22 +1,26 @@
 #!/bin/bash
 
-DOTFILES=$HOME/workspace/source-code/personal/dotfiles
+# DOTFILES=$HOME/workspace/source-code/personal/dotfiles
+DOTFILES=$(pwd)
 
-echo -e "\\nCreating symlinks"
-echo "=============================="
 linkables=$( find -H "$DOTFILES" -maxdepth 3 -name '*.symlink' )
+
+warnNotice "This will delete all your existing dotfiles, Please take a backup if you want";
+read -rn 1 -p "Do you want override existing dotfile? [y/n]: " override
+
 for file in $linkables ; do
   target="$HOME/.$( basename "$file" '.symlink' )"
-  echo "$target"
   if [ -e "$target" ]; then
-    # echo "~${target#$HOME} already exists... Skipping."
-    echo "~${target#$HOME} already exists... Deleting"
-    rm "$target"
-    echo "Creating symlink for $file"
-    ln -s "$file" "$target"
+    if [[ $override =~ ^([Yy])$ ]]; then
+      info "~${target#$HOME} already exists... Deleting"
+      rm "$target"
+      info "Creating symlink for $file"
+      ln -s "$file" "$target"
+    else
+      info "~${target#$HOME} already exists... Skipping."
+    fi
   else
-    echo "Creating symlink for $file"
+    info "Creating symlink for $file"
     ln -s "$file" "$target"
   fi
 done
-echo "=============================="

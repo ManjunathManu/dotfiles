@@ -213,6 +213,8 @@ set completeopt-=preview
 
 nmap <leader>d <Plug>(ale_go_to_definition_in_split)
 
+nmap <leader>g <Plug>(ale_go_to_definition)
+
 nmap <leader>f <Plug>(ale_fix)
 
 nmap <leader>r <Plug>(ale_find_references)

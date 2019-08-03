@@ -1,7 +1,15 @@
-# Change to projects directory
-alias work='cd ~/workspace/source-code/lightmetrics'
+alias ..='cd ..';
 
-alias ..='cd ..'
+alias ll='ls -alF'
+
+alias la='ls -A'
+
+alias l='ls -CF'
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
 
 # Create a new directory and enter it
 function mkd() {
@@ -10,7 +18,7 @@ function mkd() {
 
 alias editor='~/editor.sh';
 
-#*****************TMUX*******************
+# *****************TMUX*******************
 
 # Start tmux
 function tx(){
@@ -25,21 +33,31 @@ alias tks='tmux kill-session'
 # List all tmux sessions
 alias tls='tmux list-sessions'
 
-#****************GIT*************************
+# ****************GIT*************************
 
 alias gs='git status'
 
+alias gd='git diff'
+
+alias gc='git commit'
+
 alias gpr='git pull -r'
+
+alias gp='git push'
 
 alias gl='git log --pretty --graph'
 
 alias glo='git log --pretty --graph --oneline'
 
-#*****************JS*************************
+function gC() {
+  git checkout $1
+}
+
+# *****************JS*************************
 
 alias nrl='npm run local'
 
-#*****************VIM************************
+# *****************VIM************************
 
 alias vimrc='vim ~/.vimrc'
 
@@ -49,11 +67,13 @@ alias tmuxconf='vim ~/.tmux.conf'
 
 alias baliases='vim ~/.bash_aliases'
 
-#*********************DOCKER********************
+# *********************DOCKER********************
 
 alias doccouchbase='docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase/server'
 
 alias docsyncgateway='docker run -p 4984:4984 -d couchbase/sync-gateway'
+
+alias docredis='docker run -d -p 6379:6379 redis'
 
 # ********************Nginx******************************
 
