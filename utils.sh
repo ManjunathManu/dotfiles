@@ -85,3 +85,49 @@ checkVariableExistence() {
     exit 1
   fi
 }
+
+typeExists() {
+	if [ $(type -P $1) ]; then
+		return 0
+	fi
+	return 1
+}
+
+jsonValue() {
+	key=$1
+	num=$2
+	awk -F"[,:}]" '{for(i=1;i<=NF;i++){if($i~/'$key'\042/){print $(i+1)}}}' | tr -d '"' | sed -n ${num}p
+}
+
+vercomp() {
+	if [[ $1 == $2 ]]
+	then
+		return 0
+	fi
+	local IFS=.
+	local i ver1=($1) ver2=($2)
+
+	# fill empty fields in ver1 with zeros
+	for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+	do
+		ver1[i]=0
+	done
+
+	for ((i=0; i<${#ver1[@]}; i++))
+	do
+		if [[ -z ${ver2[i]} ]]
+		then
+			# fill empty fields in ver2 with zeros
+			ver2[i]=0
+		fi
+		if ((10#${ver1[i]} > 10#${ver2[i]}))
+		then
+			return 1
+		fi
+		if ((10#${ver1[i]} < 10#${ver2[i]}))
+		then
+			return 2
+		fi
+	done
+	return 0
+}

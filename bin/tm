@@ -1,14 +1,10 @@
 #!/bin/bash
 
-# abort if we're already inside a TMUX session
-# [ "$TMUX" == "" ] || exit 0
-# startup a "default" session if non currently exists
-# tmux has-session -t _default || tmux new-session -s _default -d
-
 # present menu for user to choose which workspace to open
 PS3="Please choose your session: "
+
 # shellcheck disable=SC2207
-options=($(tmux list-sessions -F "#S" 2>/dev/null) "New Session") 
+options=($(tmux list-sessions -F "#S" 2>/dev/null) "New Session")
 echo "Available sessions"
 echo "------------------"
 echo " "
@@ -26,4 +22,3 @@ do
 			;;
 	esac
 done
-

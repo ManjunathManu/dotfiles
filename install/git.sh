@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-Note =  "Using this helper will store your passwords unencrypted on disk, protected only by filesystem permissions.
+Note="Using this helper will store your passwords unencrypted on disk, protected only by filesystem permissions.
 If this is not an acceptable security tradeoff, try git-credential-cache[1], or
 find a helper that integrates with secure storage provided by your operating system.";
 
@@ -27,7 +27,7 @@ if [[ $configGit =~ ^([Yy])$ ]]; then
   if [[ "$( uname )" == "Darwin" ]]; then
     git config --global credential.helper "osxkeychain"
   else
-    note $Note;
+    note "$Note";
     newLine
 
     note "The point of this helper is to reduce the number of times you must type your username or password."
