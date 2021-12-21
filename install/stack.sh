@@ -11,7 +11,7 @@ sudo apt-get update
 installNvm() {
   h2 "Installing prerequisite packages for NVM"
   runCommand "sudo apt-get install build-essential libssl-dev"
-  runCommand "url -sL https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh -o install_nvm.sh";
+  runCommand "curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh -o install_nvm.sh";
   runCommand "bash install_nvm.sh"
 }
 
@@ -33,12 +33,12 @@ installDocker() {
 installAwsCli() {
 	if ! typeExists "pip"; then
 		h2 "Installing Python PIP"
-		runCommand "sudo apt-get install -y python-pip"
+		runCommand "sudo apt-get install -y python3-pip"
 		success "Installing PIP (`pip --version`) succeeded"
 	fi
 
 	h2 "Installing AWS CLI"
-	runCommand "sudo pip install awscli"
+	runCommand "sudo pip3 install awscli"
 }
 
 installPython() {
@@ -62,7 +62,7 @@ fi
 
 # Install Angular CLI
 if ! typeExists "ng"; then
-  runCommand "sudo npm install -g @angular/cli"
+  runCommand "npm install -g @angular/cli"
   success "Installing ng cli succeeded"
 else
   success "Angular cli(ng) is already installed"

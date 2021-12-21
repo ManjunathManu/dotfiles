@@ -19,27 +19,22 @@ set -g status-interval 5
 
 # default statusbar colors
 # set-option -g status-bg colour129
-set-option -g status-fg $tm_color_active
-set-option -g status-bg default
-set-option -g status-attr default
+set-option -g status-style fg=$tm_color_active,bg=default,default
 
 # default window title colors
-set-window-option -g window-status-fg $tm_color_inactive
-set-window-option -g window-status-bg default
+set-window-option -g window-status-style fg=$tm_color_inactive,bg=default
 set -g window-status-format "#I #W"
 
 # active window title colors
-set-window-option -g window-status-current-fg $tm_color_active
-set-window-option -g window-status-current-bg default
+set-window-option -g window-status-current-style fg=$tm_color_active,bg=default
 set-window-option -g  window-status-current-format "#[bold]#I #W"
 
 # pane border
-set-option -g pane-border-fg $tm_color_inactive
-set-option -g pane-active-border-fg $tm_active_border_color
+set-option -g pane-border-style fg=$tm_color_inactive
+set-option -g pane-active-border-style fg=$tm_active_border_color
 
 # message text
-set-option -g message-bg default
-set-option -g message-fg $tm_color_active
+set-option -g message-style fg=$tm_color_active,bg=default
 
 # pane number display
 set-option -g display-panes-active-colour $tm_color_active
@@ -59,10 +54,11 @@ tm_date="#[fg=$tm_color_white] $tm_date_utc"
 tm_host="#[fg=$tm_color_feature,bold]#h"
 tm_ip="#(hostname -I | awk '{print $1}') ::"
 tm_session_name="#[fg=$tm_color_feature,bold]#S"
+tm_public_ip="#(curl https://ipinfo.io/ip) ::"
 
 tm_cpu="#{cpu_fg_color}CPU: #{cpu_icon} #{cpu_percentage} |"
 tm_battery="#{battery_status_fg}Batt: #{battery_icon} #{battery_percentage} #{battery_remain} |"
 tm_current_path="#[fg=$tm_color_music]#{pane_current_path} |"
 
 set -g status-left $tm_session_name' '
-set -g status-right $tm_ip' '$tm_cpu' '$tm_battery' '$tm_date' '
+set -g status-right $tm_public_ip' '$tm_ip' '$tm_date' '

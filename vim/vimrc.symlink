@@ -1,31 +1,55 @@
+set hidden
+
 set nocompatible
 
 " set the runtime path to include Vundle and initialize
 
 set rtp+=~/.vim/bundle/Vundle.vim
 
+set mmp=10000
+
+set pumheight=10
+
+set updatetime=300
+
+" Give more space for displaying messages.
+set cmdheight=2
+
+" Don't pass messages to |ins-completion-menu|.
+set shortmess+=c
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+if has("patch-8.1.1564")
+  " Recently vim can merge signcolumn and number column into one
+  set signcolumn=number
+else
+  set signcolumn=yes
+endif
+
+" To get correct comment highlighting
+autocmd FileType json syntax match Comment +\/\/.\+$+
+
 call vundle#begin()
 
-" Alternatively, pass a path where Vundle should install plugins.
-" (Uncomment below line)
-" call vundle#begin('~/some/path/here')
-
-
 " let Vundle manage Vundle
-Plugin 'VundleVim/Vundle.vim'
+
+" "Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'tpope/vim-fugitive'
 
 Plugin 'scrooloose/nerdtree'
 
-Plugin 'w0rp/ale'
+" Plugin 'w0rp/ale'
 
 Plugin 'ctrlpvim/ctrlp.vim'
 
 " typescript syntax highlighter
 Plugin 'leafgarland/typescript-vim'
 
-Plugin 'valloric/youcompleteme'
+Plugin 'neoclide/coc.nvim', {'branch': 'release'}
+
+" Plugin 'valloric/youcompleteme'
 
 " Vim plugin for intensely orgasmic commenting
 Plugin 'scrooloose/nerdcommenter'
@@ -37,6 +61,8 @@ Plugin 'mattn/emmet-vim'
 " Javascript syntax highlighting
 Plugin 'pangloss/vim-javascript'
 
+" Jsx syntax highlighting
+Plugin 'mxw/vim-jsx'
 
 " Plugin 'vim-airline/vim-airline'
 
@@ -96,10 +122,12 @@ set tabstop=2 shiftwidth=2 expandtab
 
 " Folders to ignore in vimgrep search
 " Commma seperated list
-" set wildignore+=**/node_modules/**,**/documentation/**
-set wildignore+=**/documentation/**
+set wildignore+=**/node_modules/**,**/documentation/**,**/target/**
+" set wildignore+=**/documentation/**
 
 set foldmethod=indent
+
+set foldlevel=1
 
 set t_Co=256
 
@@ -152,12 +180,12 @@ inoremap {;<CR> {<CR>};<ESC>O
 " ><CR> to auotcomplete and put cursor in new line
 " ><Leader> to cancel autocompletion for this time
 " Only in HTML and XML files
-function s:CompleteTags()
-  inoremap <buffer> > ></<C-x><C-o><Esc>:startinsert!<CR><C-O>?</<CR>
-  inoremap <buffer> ><Leader> >
-  inoremap <buffer> ><CR> ></<C-x><C-o><Esc>:startinsert!<CR><C-O>?</<CR><CR><Tab><CR><Up><C-O>$
-endfunction
-autocmd BufRead,BufNewFile *.html,*.xml call s:CompleteTags()
+" function s:CompleteTags()
+  " inoremap <buffer> > ></<C-x><C-o><Esc>:startinsert!<CR><C-O>?</<CR>
+  " inoremap <buffer> ><Leader> >
+  " inoremap <buffer> ><CR> ></<C-x><C-o><Esc>:startinsert!<CR><C-O>?</<CR><CR><Tab><CR><Up><C-O>$
+" endfunction
+" autocmd BufRead,BufNewFile *.html,*.xml call s:CompleteTags()
 
 
 " check if your vim version supports it
@@ -194,7 +222,14 @@ let g:NERDTreeMouseMode=3
 
 
 " Exclude node_modules during search
-let g:ctrlp_custom_ignore = 'node_modules'
+let g:ctrlp_custom_ignore = '\v[\/](node_modules|target|dist)|(\.(swp|ico|git|svn))$'
+
+" Default file search 
+let g:ctrlp_by_filename=1
+
+" " Default mode as file
+" let g:ctrlp_cmd = 'CtrlPMRU'
+
 
 autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 
@@ -204,34 +239,47 @@ endif
 
 
 let g:ycm_semantic_triggers['typescript'] = ['.']
+let g:ycm_semantic_triggers['java'] = ['.']
 
 set completeopt-=preview
 
 
 " ************************* ALE *********************************
 
+" nmap <leader>d <Plug>(ale_go_to_definition-split)
 
-nmap <leader>d <Plug>(ale_go_to_definition_in_split)
+" nmap <leader>g <Plug>(ale_go_to_definition)
 
-nmap <leader>g <Plug>(ale_go_to_definition)
+" nmap <leader>f <Plug>(ale_fix)
 
-nmap <leader>f <Plug>(ale_fix)
+" nmap <leader>r <Plug>(ale_find_references)
 
-nmap <leader>r <Plug>(ale_find_references)
+" nmap <leader>h <Plug>(ale_hover)
 
-nmap <leader>h <Plug>(ale_hover)
+" let g:ale_linters = {
+  " \ 'java': ['javac']
+  " \ }
 
-let g:ale_fixers = {
-      \   '*': ['remove_trailing_lines', 'trim_whitespace'],
-      \   'javascript': ['eslint'],
-      \   'typescript': ['tslint'],
-      \   'css': ['prettier'],
-      \   'scss': ['prettier'],
-      \ }
+" let g:ale_fixers = {
+			" \   '*': ['remove_trailing_lines', 'trim_whitespace'],
+			" \   'javascript': ['eslint'],
+			" \   'typescript': ['tslint'],
+			" \   'css': ['prettier'],
+			" \   'scss': ['prettier'],
+			" \   'java': ['google_java_format']
+			" \ }
+
+" let g:ale_pattern_options = {
+      " \ '/home/manju/Workspace/Source-code/Lightmetrics/nodejs/microservices/*': {
+      " \      'ale_fixers': { 'javascript': ['eslint', 'prettier'] }
+      " \ }
+      " \ }
 
 
 " Set this variable to 1 to fix files when you save them.
-let g:ale_fix_on_save = 1
+" let g:ale_fix_on_save = 0
+
+" let g:ale_enabled = 0
 
 " Dont run linter on text change
 " let g:ale_lint_on_text_changed = 'never'
@@ -242,16 +290,15 @@ let g:ale_fix_on_save = 1
 " let g:ale_completion_enabled = 1
 
 
-let g:ale_sign_column_always = 1
+" let g:ale_sign_column_always = 1
 
-let g:ale_sign_error = '>>'
+" let g:ale_sign_error = '>>'
 
-let g:ale_sign_warning = '--'
+" let g:ale_sign_warning = '--'
 
-nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+" nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 
-nmap <silent> <C-j> <Plug>(ale_next_wrap)
-
+" nmap <silent> <C-j> <Plug>(ale_next_wrap)
 
 
 " ******************* NERD Commenter *******************************
@@ -286,3 +333,72 @@ autocmd FileType html,css EmmetInstall
 let g:javascript_plugin_jsdoc = 1
 
 let g:javascript_plugin_ngdoc = 1
+
+
+" ******************** Python ***************************************
+
+let python_highlight_all = 1
+
+
+" ********************* Java ****************************************
+let g:syntastic_java_checkers = []
+
+let g:EclimFileTypeValidate = 0
+
+" ******************** COC ********************
+let g:coc_global_extensions = [
+  \ 'coc-tsserver',
+  \ 'coc-java',
+  \ 'coc-angular',
+  \ 'coc-css',
+  \ 'coc-eslint',
+  \ 'coc-highlight',
+  \ 'coc-html',
+  \ 'coc-python',
+  \ 'coc-snippets',
+  \ 'coc-prettier'
+  \]
+
+" Use :Prettier to format current buffer.
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+
+" Use `[e` and `]e` to navigate diagnostics errors
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
+nmap <silent> [e <Plug>(coc-diagnostic-prev-error)
+nmap <silent> ]e <Plug>(coc-diagnostic-next-error)
+nmap <silent> le <Plug>(coc-list-diagnostics)
+" Symbol renaming.
+nmap <silent> rn <Plug>(coc-rename)
+" Apply AutoFix to problem on the current line.
+nmap <silent> qf  <Plug>(coc-fix-current)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> pd :sp<CR><Plug>(coc-definition)
+
+" Format selected range
+nmap <leader>f  <Plug>(coc-format-selected)
+
+" Use h for show documentation in preview window
+nnoremap <leader>h :call <SID>show_documentation()<CR>
+
+" Use <tab> to confirm completion.
+if exists('*complete_info')
+  inoremap <expr> <tab> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<tab>"
+else
+  inoremap <expr> <tab> pumvisible() ? "\<C-y>" : "\<tab>"
+endif
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+function! s:show_documentation()
+  if &filetype == 'vim'
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
