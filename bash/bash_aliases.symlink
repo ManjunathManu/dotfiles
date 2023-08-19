@@ -73,7 +73,7 @@ function sec_grp_update(){
 # Update AWS SSO credentials
 function init_aws_sso(){
   echo "Initiating AWS SSO login..."
-  nvm run v14.17.6 $HOME/Workspace/Source-code/Lightmetrics/nodejs/misc/aws-sso-creds-tool/app.js;
+  `which node` $HOME/Workspace/Source-code/Lightmetrics/nodejs/misc/aws-sso-creds-tool/app.js;
 }
 
 # *****************TMUX*******************
@@ -163,3 +163,35 @@ alias nginx-verify-config="sudo nginx -t"
 
 # Reload bashrc
 alias rbash='source ~/.bashrc'
+
+# ********************** export profile_name ****************************
+
+function exp-aws-profile() {
+  h1 "exporting AWS_PROFILE..."
+  case $@ in
+    dev)
+      info "export AWS_PROFILE=Lightmetrics-DevTestAccount-1_AdministratorAccess"
+      export AWS_PROFILE=Lightmetrics-DevTestAccount-1_AdministratorAccess
+      ;;
+
+    prod)
+      info "export AWS_PROFILE=Lightmetrics-ProductionAccount-1_AdministratorAccess"
+      export AWS_PROFILE=Lightmetrics-ProductionAccount-1_AdministratorAccess
+      ;;
+
+    master-prod)
+      info "export AWS_PROFILE=Lightmetrics-MasterProduction_PowerUserAccess"
+      export AWS_PROFILE=Lightmetrics-MasterProduction_PowerUserAccess
+      ;;
+
+    operations)
+      info "export AWS_PROFILE=Lightmetrics-OperationsAccount-1_AdministratorAccess"
+      export AWS_PROFILE=Lightmetrics-OperationsAccount-1_AdministratorAccess
+      ;;
+
+    *)
+      error "Invalid profile name: only [dev, prod, master-prod, operations] is allowed"
+      ;;
+  esac
+}
+

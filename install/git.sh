@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source utils.sh
+
 Note="Using this helper will store your passwords unencrypted on disk, protected only by filesystem permissions.
 If this is not an acceptable security tradeoff, try git-credential-cache[1], or
 find a helper that integrates with secure storage provided by your operating system.";

@@ -10,14 +10,14 @@ sudo apt-get update
 
 installNvm() {
   h2 "Installing prerequisite packages for NVM"
-  runCommand "sudo apt-get install build-essential libssl-dev"
+  runCommand "sudo apt-get install -y build-essential libssl-dev"
   runCommand "curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh -o install_nvm.sh";
   runCommand "bash install_nvm.sh"
 }
 
 installDocker() {
   # Install a few prerequisite packages which let apt use packages over HTTPS:
-  runCommand "sudo apt install apt-transport-https ca-certificates curl software-properties-common"
+  runCommand "sudo apt install -y apt-transport-https ca-certificates curl software-properties-common"
   # Add the GPG key for the official Docker repository to your system
   runCommand "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -"
   # Add the Docker repository to APT sources
@@ -27,7 +27,7 @@ installDocker() {
   # Make sure you are about to install from the Docker repo instead of the default Ubuntu repo:
   runCommand "apt-cache policy docker-ce"
   # Finally, install Docker
-  runCommand "sudo apt install docker-ce"
+  runCommand "sudo apt install -y docker-ce"
 }
 
 installAwsCli() {
@@ -92,7 +92,7 @@ else
 fi
 
 # Install tmux
-if ! typeExists "aws"; then
+if ! typeExists "tmux"; then
   runCommand "sudo apt-get install tmux"
   success "tmux installed successfully"
 else

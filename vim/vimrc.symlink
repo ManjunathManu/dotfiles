@@ -122,7 +122,7 @@ set tabstop=2 shiftwidth=2 expandtab
 
 " Folders to ignore in vimgrep search
 " Commma seperated list
-set wildignore+=**/node_modules/**,**/documentation/**,**/target/**
+set wildignore+=**/node_modules/**,**/documentation/**,**/target/**,**/logs/**
 " set wildignore+=**/documentation/**
 
 set foldmethod=indent
@@ -187,6 +187,10 @@ inoremap {;<CR> {<CR>};<ESC>O
 " endfunction
 " autocmd BufRead,BufNewFile *.html,*.xml call s:CompleteTags()
 
+" Presss TAB for autocompletion
+inoremap <silent><expr> <TAB> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<TAB>"
+
+inoremap <Leader>Y "+y
 
 " check if your vim version supports it
 if has('persistent_undo')
@@ -232,6 +236,8 @@ let g:ctrlp_by_filename=1
 
 
 autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
+
+autocmd BufNewFile,BufRead .env* setlocal filetype=sh
 
 if !exists("g:ycm_semantic_triggers")
   let g:ycm_semantic_triggers = {}
@@ -385,12 +391,12 @@ nmap <leader>f  <Plug>(coc-format-selected)
 " Use h for show documentation in preview window
 nnoremap <leader>h :call <SID>show_documentation()<CR>
 
-" Use <tab> to confirm completion.
-if exists('*complete_info')
-  inoremap <expr> <tab> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<tab>"
-else
-  inoremap <expr> <tab> pumvisible() ? "\<C-y>" : "\<tab>"
-endif
+" " Use <tab> to confirm completion.
+" if exists('*complete_info')
+  " inoremap <expr> <tab> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<tab>"
+" else
+  " inoremap <expr> <tab> pumvisible() ? "\<C-y>" : "\<tab>"
+" endif
 
 " Highlight symbol under cursor on CursorHold
 autocmd CursorHold * silent call CocActionAsync('highlight')
