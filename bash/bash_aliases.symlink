@@ -27,38 +27,38 @@ function mkd() {
 function work() {
   case $@ in
     builder)
-      cd ~/Workspace/Source-code/Lightmetrics/nodejs/microservices/server-builder;
+      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/server-builder;
       ;;
 
     fleet)
-      cd ~/Workspace/Source-code/Lightmetrics/nodejs/microservices/lm-api-fleet;
+      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/lm-api-fleet;
       ;;
 
     driver)
-      cd ~/Workspace/Source-code/Lightmetrics/nodejs/microservices/lm-api-driver;
+      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/lm-api-driver;
       ;;
 
     asset)
-      cd ~/Workspace/Source-code/Lightmetrics/nodejs/microservices/lm-api-assets;
+      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/lm-api-assets;
       ;;
 
     commons)
-      cd ~/Workspace/Source-code/Lightmetrics/nodejs/microservices/lm-api-commons;
+      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/lm-api-commons;
       ;;
 
     locee)
-      cd ~/Workspace/Source-code/Lightmetrics/nodejs/microservices/lm-api-location-intel;
+      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/lm-api-location-intel;
       ;;
 
     white)
-      cd ~/Workspace/Source-code/Lightmetrics/nodejs/white-label-backend;
+      cd ~/workspace/source-code/lightmetrics/nodejs/white-label-backend;
       ;;
 
     aws-utils)
-      cd ~/Workspace/Source-code/Lightmetrics/nodejs/aws-utils;
+      cd ~/workspace/source-code/lightmetrics/nodejs/aws-utils;
       ;;
     *)
-      cd ~/Workspace/Source-code/Lightmetrics;
+      cd ~/workspace/source-code/lightmetrics;
   esac
 }
 
@@ -67,20 +67,20 @@ alias editor='~/editor.sh';
 # Update AWS Security group
 function sec_grp_update(){
   echo "Trying to update AWS Security group: $1"
-  `which node $HOME/Workspace/Source-code/Lightmetrics/nodejs/misc/aws-utils/src/update-sg.js` $1;
+  `which node $HOME/workspace/source-code/lightmetrics/nodejs/misc/aws-utils/src/update-sg.js` $1;
 }
 
 # Update AWS SSO credentials
 function init_aws_sso(){
   echo "Initiating AWS SSO login..."
-  `which node` $HOME/Workspace/Source-code/Lightmetrics/nodejs/misc/aws-sso-creds-tool/app.js;
+  `which node` $HOME/workspace/source-code/lightmetrics/nodejs/misc/aws-sso-creds-tool/app.js;
 }
 
 # *****************TMUX*******************
 
 # Start tmux
 function tx(){
- source "$HOME/Workspace/Source-code/Personal/dotfiles/bin/tm"
+ source "$HOME/workspace/source-code/personal/dotfiles/bin/tm"
 }
 
 alias tmux='tmux -u'
@@ -195,3 +195,4 @@ function exp-aws-profile() {
   esac
 }
 
+alias chrome="open -a 'Google Chrome'"

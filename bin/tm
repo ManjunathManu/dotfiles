@@ -3,11 +3,15 @@
 # present menu for user to choose which workspace to open
 PS3="Please choose your session: "
 
-# shellcheck disable=SC2207
-options=($(tmux list-sessions -F "#S" 2>/dev/null) "New Session")
+# Get a list of Tmux sessions
+sessions=($(tmux list-sessions -F "#S" 2>/dev/null))
+options=($sessions "New Session")
+
 echo "Available sessions"
 echo "------------------"
 echo " "
+
+# Use the select loop to present options to the user
 select opt in "${options[@]}"
 do
 	case $opt in

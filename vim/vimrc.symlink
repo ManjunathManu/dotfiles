@@ -28,6 +28,7 @@ else
 endif
 
 " To get correct comment highlighting
+
 autocmd FileType json syntax match Comment +\/\/.\+$+
 
 call vundle#begin()
@@ -107,7 +108,7 @@ set background=dark
 
 set signcolumn=yes
 
-colorscheme solarized8_high
+colorscheme solarized8
 
 set ttimeoutlen=10
 
@@ -276,7 +277,7 @@ set completeopt-=preview
 			" \ }
 
 " let g:ale_pattern_options = {
-      " \ '/home/manju/Workspace/Source-code/Lightmetrics/nodejs/microservices/*': {
+      " \ '/home/manju/workspace/source-code/lightmetrics/nodejs/microservices/*': {
       " \      'ale_fixers': { 'javascript': ['eslint', 'prettier'] }
       " \ }
       " \ }

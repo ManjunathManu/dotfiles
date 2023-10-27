@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source utils.sh
+
 # DOTFILES=$HOME/workspace/source-code/personal/dotfiles
 DOTFILES=$(pwd)
 

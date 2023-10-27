@@ -6,34 +6,36 @@ source $NVM_DIR/nvm.sh
 h2 "Quickly configure your development environment by installing required packages";
 
 info "Refreshing local package index";
-sudo apt-get update
+# brew update
 
 installNvm() {
   h2 "Installing prerequisite packages for NVM"
-  runCommand "sudo apt-get install -y build-essential libssl-dev"
-  runCommand "curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh -o install_nvm.sh";
+  # runCommand "brew install  build-essential libssl-dev"
+  runCommand "curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.20.0/install.sh -o install_nvm.sh";
   runCommand "bash install_nvm.sh"
 }
 
 installDocker() {
-  # Install a few prerequisite packages which let apt use packages over HTTPS:
-  runCommand "sudo apt install -y apt-transport-https ca-certificates curl software-properties-common"
+  # Install a few prerequisite packages which let brew use packages over HTTPS:
+  runCommand "brew install  brew-transport-https ca-certificates curl software-properties-common"
   # Add the GPG key for the official Docker repository to your system
-  runCommand "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -"
-  # Add the Docker repository to APT sources
-  runCommand "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable\""
+  runCommand "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | brew-key add -"
+  # Add the Docker repository to brew sources
+  runCommand "sudo add-brew-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable\""
   # Update the package database with the Docker packages from the newly added repo
-  runCommand "sudo apt update"
+  runCommand "brew update"
   # Make sure you are about to install from the Docker repo instead of the default Ubuntu repo:
-  runCommand "apt-cache policy docker-ce"
+  runCommand "brew-cache policy docker-ce"
   # Finally, install Docker
-  runCommand "sudo apt install -y docker-ce"
+  runCommand "brew install  docker-ce"
 }
 
 installAwsCli() {
 	if ! typeExists "pip"; then
 		h2 "Installing Python PIP"
-		runCommand "sudo apt-get install -y python3-pip"
+		# runCommand "brew install  python3-pip"
+    runCommand "curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py"
+    runCommand "python3 get-pip.py"
 		success "Installing PIP (`pip --version`) succeeded"
 	fi
 
@@ -43,13 +45,14 @@ installAwsCli() {
 
 installPython() {
   # Add the deadsnakes PPA to your sources list
-  runCommand "sudo add-apt-repository ppa:deadsnakes/ppa"
-  runCommand "sudo apt install python3.7"
+  # runCommand "sudo add-brew-repository ppa:deadsnakes/ppa"
+  runCommand "brew install python@3.9"
 }
 
 installNginx() {
-  runCommand "sudo apt install nginx"
-  runCommand "sudo ufw allow \'Nginx HTTP\'"
+  runCommand "brew install nginx"
+  # runCommand "sudo ufw allow \'Nginx HTTP\'"
+  runCommand "sudo nginx -g \"daemon off\""
 }
 
 # Install NVM
@@ -70,7 +73,7 @@ fi
 
 # Install Docker
 if ! typeExists "docker"; then
-  installDocker
+  # installDocker
   success "Installing docker successfully"
 else
   success "Docker is alreay installed"
@@ -93,7 +96,7 @@ fi
 
 # Install tmux
 if ! typeExists "tmux"; then
-  runCommand "sudo apt-get install tmux"
+  runCommand "brew install tmux"
   success "tmux installed successfully"
 else
   success "tmux is already installed"
@@ -109,7 +112,7 @@ fi
 
 # Install vim
 if ! typeExists "vim"; then
-  runCommand "sudo apt-get install vim"
+  runCommand "brew install vim"
   success "vim installed successfully"
 else
   success "vim is already installed"

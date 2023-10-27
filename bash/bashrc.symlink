@@ -2,11 +2,16 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+export NVM_DIR=~/.nvm
+source $(brew --prefix nvm)/nvm.sh
+
 # If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
+# case $- in
+    # *i*) ;;
+      # *) return;;
+# esac
+
+export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -58,9 +63,9 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-# Get branch name when pwd is git repo
-parse_git_branch() {
-     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+# Function to parse Git branch
+function parse_git_branch() {
+    git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/[\1]/p'
 }
 
 if [ "$color_prompt" = yes ]; then
@@ -132,10 +137,10 @@ confirm() {
 
 replicator ()
 {
-  ~/Workspace/Source-code/Lightmetrics/couchdb_feeds/process/replicator.sh $@
+  ~/workspace/source-code/lightmetrics/couchdb_feeds/process/replicator.sh $@
 }
 complete -F _replicator replicator
-alias ic="ibmcloud"
+
 work
 
 complete -C /usr/bin/terraform terraform
@@ -157,14 +162,14 @@ complete -C '/usr/local/bin/aws_completer' aws
 # unset __conda_setup
 # # <<< conda initialize <<<
 
-source ~/utils.sh
+source ~/workspace/source-code/personal/dotfiles/utils.sh
+
+if [ -f ~/.git-completion.bash ]; then
+  . ~/.git-completion.bash
+fi
 
 # export PATH="/usr/node-v18.15.0/bin:$PATH"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-
 # Load Angular CLI autocompletion.
 source <(ng completion script)
+
