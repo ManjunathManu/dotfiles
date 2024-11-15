@@ -46,13 +46,13 @@ set-window-option -g clock-mode-colour $tm_color_active
 #Battery
 set -g @batt_remain_short true
 
-tm_date_utc="#(date --utc +%Y-%m-%dT%%H:%%M:%%SZ)"
-tm_date_ist="#(TZ=Asia/Kolkata date +%d/%m/%Y,' '%%H:%%M:%%S) IST ::"
-# tm_date="#[fg=$tm_color_white] $tm_date_ist $tm_date_utc"
-tm_date="#[fg=$tm_color_white] $tm_date_utc"
+tm_date_utc="#(date -u)"
+tm_date_ist="#(TZ=Asia/Kolkata date +%Y/%m/%d,' '%H:%M)IST ::"
+tm_date="#[fg=$tm_color_white] $tm_date_ist $tm_date_utc"
+# tm_date="#[fg=$tm_color_white] $tm_date_utc"
 
 tm_host="#[fg=$tm_color_feature,bold]#h"
-tm_ip="#(hostname -I | awk '{print $1}') ::"
+tm_ip="#(hostname -I | awk '{print $1}')"
 tm_session_name="#[fg=$tm_color_feature,bold]#S"
 tm_public_ip="#(curl https://ipinfo.io/ip) ::"
 
