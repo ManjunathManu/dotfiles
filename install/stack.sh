@@ -124,3 +124,19 @@ if ! typeExists "nginx"; then
 else
   success "Nginx is already installed"
 fi
+
+# Install fd (faster alternative to find)
+h2 "Installing fd (find alternative)"
+if typeExists fd; then
+    success "fd already installed"
+else
+    runCommand "brew install fd" "Failed to install fd" "fd installed successfully"
+fi
+
+# Install bat (better cat with syntax highlighting)
+h2 "Installing bat (cat alternative)"
+if typeExists bat; then
+    success "bat already installed"
+else
+    runCommand "brew install bat" "Failed to install bat" "bat installed successfully"
+fi

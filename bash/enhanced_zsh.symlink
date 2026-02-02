@@ -1,0 +1,112 @@
+#!/bin/zsh
+# Enhanced zsh configuration with fzf, autosuggestions, and better history
+
+# ============================================
+# ENHANCED HISTORY CONFIGURATION
+# ============================================
+
+# Increase history size dramatically
+export HISTSIZE=50000
+export SAVEHIST=100000
+export HISTFILE=~/.zsh_history
+
+# History options
+setopt EXTENDED_HISTORY          # Write timestamp to history file
+setopt INC_APPEND_HISTORY        # Add commands immediately
+setopt SHARE_HISTORY             # Share history across sessions
+setopt HIST_IGNORE_ALL_DUPS      # Remove older duplicates
+setopt HIST_FIND_NO_DUPS         # Don't show duplicates in search
+setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks
+setopt HIST_VERIFY               # Show command before executing from history
+setopt HIST_IGNORE_SPACE         # Don't record commands starting with space
+
+# ============================================
+# FZF CONFIGURATION
+# ============================================
+
+# Source fzf key bindings and completion if installed
+if [[ -f ~/.fzf.zsh ]]; then
+    source ~/.fzf.zsh
+fi
+
+# Custom fzf options (same as bash)
+export FZF_DEFAULT_OPTS="
+  --height 80%
+  --border
+  --layout=reverse
+  --info=inline
+  --multi
+  --preview-window=:hidden
+  --preview '([[ -f {} ]] && (bat --style=numbers --color=always {} || cat {})) || ([[ -d {} ]] && (tree -C {} | head -200))'
+  --color='hl:148,hl+:154,pointer:032,marker:010,bg+:237,gutter:008'
+  --prompt='∼ ' --pointer='▶' --marker='✓'
+  --bind '?:toggle-preview'
+  --bind 'ctrl-a:select-all'
+  --bind 'ctrl-y:execute-silent(echo {+} | pbcopy)'
+  --bind 'ctrl-e:execute(echo {+} | xargs -o vim)'
+"
+
+# Use fd for fzf if available (faster than find)
+if command -v fd &> /dev/null; then
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
+
+# Better directory search
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+
+# ============================================
+# ZSH AUTOSUGGESTIONS
+# ============================================
+
+# Load zsh-autosuggestions
+ZSH_AUTOSUGGEST_DIR="${HOME}/.zsh/plugins/zsh-autosuggestions"
+if [[ -f "${ZSH_AUTOSUGGEST_DIR}/zsh-autosuggestions.zsh" ]]; then
+    source "${ZSH_AUTOSUGGEST_DIR}/zsh-autosuggestions.zsh"
+
+    # Configuration
+    export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#666666"  # Gray color
+    export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+    export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+
+    # Keybindings
+    bindkey '^ ' autosuggest-accept  # Ctrl+Space to accept
+fi
+
+# ============================================
+# COMMAND PALETTE
+# ============================================
+
+# Custom command palette function
+command_palette() {
+    source ~/.fzf/command-palette.sh
+}
+
+# Bind Ctrl+G to command palette
+bindkey -s '^G' 'command_palette\n'
+
+# ============================================
+# ENHANCED COMPLETIONS
+# ============================================
+
+# Enable fzf completion for common commands
+# **<TAB> trigger (e.g., vim **<TAB>, cd **<TAB>)
+
+_fzf_compgen_path() {
+  fd --hidden --follow --exclude ".git" . "$1"
+}
+
+_fzf_compgen_dir() {
+  fd --type d --hidden --follow --exclude ".git" . "$1"
+}
+
+# Better kill completion
+fzf_kill_completion() {
+    ps -ef | sed 1d | fzf -m | awk '{print $2}'
+}
+
+# Git branch selection with fzf
+fzf_git_branch() {
+    git branch -a | grep -v HEAD | sed "s/.* //" | sed "s#remotes/[^/]*/##" | sort -u | \
+    fzf --height 40% --reverse
+}

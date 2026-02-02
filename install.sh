@@ -12,6 +12,12 @@ source install/link.sh
 
 h1 "Step 3: Configure git globally"
 source install/git.sh
+
+h1 "Step 4: Setup Enhanced Terminal Features"
+source install/fzf_setup.sh
+
+h1 "Step 5: Setup Zsh Plugins"
+source install/zsh_plugins_setup.sh
 newLine
 
 h2 "Your development stack"

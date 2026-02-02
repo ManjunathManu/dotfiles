@@ -1,0 +1,84 @@
+#!/bin/bash
+# Enhanced bash configuration with fzf and better history
+
+# ============================================
+# ENHANCED HISTORY CONFIGURATION
+# ============================================
+
+# Increase history size dramatically
+export HISTSIZE=50000
+export HISTFILESIZE=100000
+
+# Add timestamps to history
+export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  "
+
+# Better history control
+export HISTCONTROL=ignoreboth:erasedups  # Ignore dupes and lines with leading space
+
+# Append to history file, don't overwrite
+shopt -s histappend
+
+# Save history after each command
+export PROMPT_COMMAND="history -a; history -n${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+
+# ============================================
+# FZF CONFIGURATION
+# ============================================
+
+# Source fzf key bindings and completion if installed
+if [[ -f ~/.fzf.bash ]]; then
+    source ~/.fzf.bash
+fi
+
+# Custom fzf options
+export FZF_DEFAULT_OPTS="
+  --height 80%
+  --border
+  --layout=reverse
+  --info=inline
+  --multi
+  --preview-window=:hidden
+  --preview '([[ -f {} ]] && (bat --style=numbers --color=always {} || cat {})) || ([[ -d {} ]] && (tree -C {} | head -200))'
+  --color='hl:148,hl+:154,pointer:032,marker:010,bg+:237,gutter:008'
+  --prompt='∼ ' --pointer='▶' --marker='✓'
+  --bind '?:toggle-preview'
+  --bind 'ctrl-a:select-all'
+  --bind 'ctrl-y:execute-silent(echo {+} | pbcopy)'
+  --bind 'ctrl-e:execute(echo {+} | xargs -o vim)'
+"
+
+# Use fd for fzf if available (faster than find)
+if command -v fd &> /dev/null; then
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
+
+# Better directory search
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+
+# ============================================
+# COMMAND PALETTE
+# ============================================
+
+# Custom command palette function
+command_palette() {
+    source ~/.fzf/command-palette.sh
+}
+
+# Bind Ctrl+G to command palette
+bind -x '"\C-g": command_palette'
+
+# ============================================
+# ENHANCED COMPLETIONS
+# ============================================
+
+# Enable fzf completion for common commands
+# **<TAB> trigger (e.g., vim **<TAB>, cd **<TAB>)
+
+_fzf_compgen_path() {
+  fd --hidden --follow --exclude ".git" . "$1"
+}
+
+_fzf_compgen_dir() {
+  fd --type d --hidden --follow --exclude ".git" . "$1"
+}

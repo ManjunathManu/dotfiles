@@ -542,3 +542,12 @@ complete -F __start_kubectl k
 
 # uv
 export PATH="/Users/manju/.local/bin:$PATH"
+
+# ============================================
+# ENHANCED TERMINAL FEATURES
+# ============================================
+
+# Load enhanced bash configuration
+if [ -f ~/.enhanced_bash ]; then
+    source ~/.enhanced_bash
+fi

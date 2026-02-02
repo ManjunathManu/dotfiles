@@ -1,0 +1,234 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# Git autocompletion
+autoload -Uz compinit && compinit
+
+autoload -U +X bashcompinit && bashcompinit
+autoload -U +X compinit && compinit
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+# shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+# shopt -s checkwinsize
+
+# If set, the pattern "**" used in a pathname expansion context will
+# match all files and zero or more directories and subdirectories.
+
+#shopt -s globstar
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+
+#force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+  # We have color support; assume it's compliant with Ecma-48
+  # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+  # a case would tend to support setf rather than setaf.)
+  color_prompt=yes
+    else
+  color_prompt=
+    fi
+fi
+
+# Function to parse Git branch
+function parse_git_branch() {
+    git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/[\1]/p'
+}
+
+# Fish-style shortened directory path
+function prompt_short_dir() {
+    local dir="${PWD/#$HOME/~}"
+    local parts=("${(@s:/:)dir}")
+    local result=""
+
+    # If we're in home directory, just show ~
+    if [[ "$dir" == "~" ]]; then
+        echo "~"
+        return
+    fi
+
+    # Build shortened path
+    for i in {1..$((${#parts[@]}-1))}; do
+        if [[ -n "${parts[$i]}" ]]; then
+            result+="${parts[$i]:0:1}/"
+        fi
+    done
+
+    # Add the last directory (full name)
+    result+="${parts[-1]}"
+    echo "$result"
+}
+
+COLOR_DEF=$'%f'
+COLOR_USR=$'%F{green}'
+COLOR_DIR=$'%F{blue}'
+COLOR_GIT=$'%F{yellow}'
+setopt PROMPT_SUBST
+export PROMPT='${COLOR_USR}%n ${COLOR_DIR}$(prompt_short_dir)${COLOR_GIT} $(parse_git_branch)${COLOR_DEF}$ '
+
+# if [ "$color_prompt" = yes ]; then
+  # PROMPT='%F{green}%n@%m%f:%F{blue}%~%u$(parse_git_branch)%F{yellow}%f% $ '
+# else
+  # PROMPT='${debian_chroot:+($debian_chroot)}%n@%m:%~$(parse_git_branch)$ '
+# fi
+# unset color_prompt force_color_prompt
+
+# precmd() {
+  # PS1="%n@%M:%~\$(parse_git_branch)%# "
+# }
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# colored GCC warnings and errors
+# export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+# Use Vim as default editor
+export VISUAL=vim
+export EDITOR="$VISUAL"
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.zsh_aliases ]; then
+    source ~/.zsh_aliases
+fi
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+# if ! shopt -oq posix; then
+#   if [ -f /usr/share/bash-completion/bash_completion ]; then
+#     . /usr/share/bash-completion/bash_completion
+#   elif [ -f /etc/bash_completion ]; then
+#     . /etc/bash_completion
+#   fi
+# fi
+
+confirm() {
+  # call with a prompt string or use a default
+  read -r -p "${1:-Are you sure? [y/N]} " response
+  case "$response" in
+    [yY][eE][sS]|[yY])
+      true
+      ;;
+    *)
+      false
+      ;;
+  esac
+}
+
+replicator ()
+{
+  ~/workspace/source-code/lightmetrics/couchdb_feeds/process/replicator.sh $@
+}
+complete -F _replicator replicator
+alias ic="ibmcloud"
+work
+
+complete -C /usr/bin/terraform terraform
+
+complete -C '/usr/local/bin/aws_completer' aws
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+# __conda_setup="$('/home/manju/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+    # eval "$__conda_setup"
+# else
+    # if [ -f "/home/manju/anaconda3/etc/profile.d/conda.sh" ]; then
+        # . "/home/manju/anaconda3/etc/profile.d/conda.sh"
+    # else
+        # export PATH="/home/manju/anaconda3/bin:$PATH"
+    # fi
+# fi
+# unset __conda_setup
+# # <<< conda initialize <<<
+
+source ~/workspace/source-code/personal/dotfiles/utils.sh
+
+# export PATH="/usr/node-v18.15.0/bin:$PATH"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+# Load Angular CLI autocompletion.
+source <(ng completion script)
+
+# SSH autocompletion for zsh
+_ssh_hosts() {
+    local -a ssh_hosts
+    if [[ -f ~/.ssh/config ]]; then
+        ssh_hosts=(${${${${(@M)${(f)"$(cat ~/.ssh/config ~/.ssh/config.d/* 2>/dev/null)"}:#Host *}#Host }:#*[*?]*}})
+    fi
+    _describe 'ssh hosts' ssh_hosts
+}
+compdef _ssh_hosts ssh
+
+# Git completion for zsh
+if [ -f ~/.git-completion.zsh ]; then
+    source ~/.git-completion.zsh
+fi
+
+# Kubectl completion for zsh
+if command -v kubectl &> /dev/null; then
+    source <(kubectl completion zsh)
+    alias k=kubectl
+    compdef k=kubectl
+fi
+
+# uv
+export PATH="/Users/manju/.local/bin:$PATH"
+
+# ============================================
+# ENHANCED TERMINAL FEATURES
+# ============================================
+
+# Load enhanced zsh configuration
+if [ -f ~/.enhanced_zsh ]; then
+    source ~/.enhanced_zsh
+fi

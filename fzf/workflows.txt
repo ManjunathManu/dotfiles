@@ -1,0 +1,113 @@
+# Git Commands
+gs | git status | Show git repository status
+gd | git diff | Show unstaged changes
+gc -m "MESSAGE" | git commit | Create a commit with message
+gp | confirm && git push | Push changes with confirmation
+gpr | git pull -r | Pull with rebase
+gl | git log --pretty --graph | Visual commit history
+glo | git log --pretty --graph --oneline | Compact commit log
+git checkout -b BRANCHNAME | git checkout | Create and switch to new branch
+git branch -d BRANCHNAME | git branch | Delete local branch
+git stash | git stash | Stash current changes
+git stash pop | git stash | Apply most recent stash
+git reset --soft HEAD~1 | git reset | Undo last commit, keep changes
+git clean -fd | git clean | Remove untracked files and directories
+
+# AWS Commands
+exp-aws-profile dev | AWS profile | Switch to dev AWS profile
+exp-aws-profile prod | AWS profile | Switch to prod AWS profile
+sso PROFILE | AWS SSO | AWS SSO login
+fetch_ssm_to_env | SSM | Fetch SSM parameters to environment
+aws s3 ls | S3 | List S3 buckets
+aws ec2 describe-instances | EC2 | List EC2 instances
+aws logs tail LOGGROUP --follow | CloudWatch | Tail CloudWatch logs
+
+# Docker Commands
+docker run -d --rm -p 6379:6379 redis | Docker | Start Redis container
+docker ps | Docker | List running containers
+docker ps -a | Docker | List all containers
+docker stats | Docker | Show container resource usage
+docker stop $(docker ps -q) | Docker | Stop all running containers
+docker system prune -a | Docker | Clean up all unused Docker resources
+docker logs -f CONTAINER | Docker | Follow container logs
+docker exec -it CONTAINER bash | Docker | Enter container shell
+
+# Tmux Commands
+tx | tmux | Tmux session selector
+tmux new-session -s NAME | tmux | Create new tmux session
+tmux kill-session -t NAME | tmux | Kill tmux session
+tmux list-sessions | tmux | List all sessions
+tmux attach -t NAME | tmux | Attach to existing session
+tmux detach | tmux | Detach from current session
+
+# Navigation
+work lisa | navigate | Navigate to Lisa project
+work ttd | navigate | Navigate to TTD project
+work python | navigate | Navigate to Python workspace
+mkd DIRNAME | filesystem | Create directory and cd into it
+cd - | navigate | Go to previous directory
+.. | navigate | Go up one directory
+... | navigate | Go up two directories
+
+# NPM Commands
+npm run local | npm | Run local development server
+npm run dev | npm | Run development server
+npm run inspect | npm | Run with inspect mode
+npm run build | npm | Build project
+npm run test | npm | Run tests
+npm install | npm | Install dependencies
+npm ci | npm | Clean install from lock file
+npm outdated | npm | Check for outdated packages
+
+# Nginx Commands
+nginx-start | nginx | Start nginx server
+nginx-restart | nginx | Restart nginx server
+nginx-tail-error.log | nginx | Tail nginx error log
+nginx-tail-access.log | nginx | Tail nginx access log
+nginx-verify-config | nginx | Verify nginx configuration
+nginx -s reload | nginx | Reload nginx configuration
+
+# System Commands
+htop | system | Interactive process viewer
+df -h | disk | Show disk usage
+du -sh * | disk | Show directory sizes
+free -h | memory | Show memory usage
+ps aux | grep PROCESS | process | Find process by name
+lsof -i :PORT | network | Show what's using a port
+netstat -tuln | network | Show listening ports
+
+# Python Commands
+python -m venv venv | python | Create virtual environment
+source venv/bin/activate | python | Activate virtual environment
+pip install -r requirements.txt | pip | Install Python dependencies
+pip freeze > requirements.txt | pip | Save current dependencies
+python -m http.server 8000 | python | Start simple HTTP server
+pytest | python | Run Python tests
+black . | python | Format Python code with black
+
+# Kubernetes Commands
+kubectl get pods | kubectl | List pods
+kubectl get services | kubectl | List services
+kubectl get deployments | kubectl | List deployments
+kubectl logs -f PODNAME | kubectl | Follow pod logs
+kubectl describe pod PODNAME | kubectl | Describe pod details
+kubectl exec -it PODNAME -- bash | kubectl | Enter pod shell
+kubectl port-forward PODNAME LOCALPORT:REMOTEPORT | kubectl | Forward pod port
+
+# File Operations
+find . -name "PATTERN" | find | Find files by name pattern
+fd PATTERN | find | Fast file search with fd
+rg "PATTERN" | search | Search file contents with ripgrep
+bat FILENAME | view | View file with syntax highlighting
+tree -L 2 | tree | Show directory tree 2 levels deep
+tar -czf archive.tar.gz DIRECTORY | archive | Create compressed archive
+tar -xzf archive.tar.gz | archive | Extract compressed archive
+
+# Miscellaneous
+history | tail -20 | history | Show last 20 commands
+alias | alias | Show all aliases
+env | grep VARNAME | environment | Find environment variable
+curl -I URL | curl | Get HTTP headers
+wget URL | wget | Download file from URL
+ssh USER@HOST | ssh | SSH into remote host
+scp FILE USER@HOST:PATH | scp | Copy file to remote host

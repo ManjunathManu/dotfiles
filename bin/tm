@@ -1,11 +1,10 @@
 #!/bin/bash
-
 # present menu for user to choose which workspace to open
 PS3="Please choose your session: "
 
 # Get a list of Tmux sessions
 sessions=($(tmux list-sessions -F "#S" 2>/dev/null))
-options=($sessions "New Session")
+options=("${sessions[@]}" "New Session")
 
 echo "Available sessions"
 echo "------------------"
