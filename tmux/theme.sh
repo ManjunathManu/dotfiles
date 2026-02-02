@@ -23,11 +23,14 @@ set-option -g status-style fg=$tm_color_active,bg=default,default
 
 # default window title colors
 set-window-option -g window-status-style fg=$tm_color_inactive,bg=default
-set -g window-status-format "#I #W"
+set -g window-status-format "#I #W#{?window_activity_flag, ●,}"
 
 # active window title colors
 set-window-option -g window-status-current-style fg=$tm_color_active,bg=default
-set-window-option -g  window-status-current-format "#[bold]#I #W"
+set-window-option -g  window-status-current-format "#[bold]#I #W#{?window_activity_flag, ●,}"
+
+# window with activity (remove gray background, keep existing text color)
+set-window-option -g window-status-activity-style bg=default,none
 
 # pane border
 set-option -g pane-border-style fg=$tm_color_inactive
@@ -61,4 +64,4 @@ tm_battery="#{battery_status_fg}Batt: #{battery_icon} #{battery_percentage} #{ba
 tm_current_path="#[fg=$tm_color_music]#{pane_current_path} |"
 
 set -g status-left $tm_session_name' '
-set -g status-right $tm_public_ip' '$tm_ip' '$tm_date' '
+set -g status-right '#{?pane_in_mode,[COPY],} '$tm_public_ip' '$tm_ip' '$tm_date' '

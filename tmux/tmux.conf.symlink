@@ -3,14 +3,56 @@ set -g prefix C-a
 unbind C-b
 bind C-a send-prefix
 
+# Mouse support - set to on if you want to use the mouse
+set -g mouse on
+
+# Allow tmux clipboard to copy to system clipboard
+set -s set-clipboard on
+
 # Use Vim shortcuts
 setw -g mode-keys vi
 
 # reload config file
 bind r source-file ~/.tmux.conf \; display "Config Reloaded!"
-bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
-# Mouse support - set to on if you want to use the mouse
-set -g mouse on
+
+##############################
+### Copy & Paste Settings  ###
+##############################
+
+# Vi-style copy mode keybindings
+bind-key -T copy-mode-vi v send-keys -X begin-selection
+bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
+bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'pbcopy'
+bind-key -T copy-mode-vi Escape send-keys -X cancel
+
+# Mouse copy-paste support (stays at current position, doesn't scroll to bottom)
+bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe 'pbcopy'
+
+# Middle-click to paste from clipboard
+bind-key -n MouseDown2Pane run "tmux set-buffer \"$(pbpaste)\"; tmux paste-buffer"
+
+# Double-click to select and copy word (stays at current position)
+bind-key -n DoubleClick1Pane select-pane \; copy-mode -M \; send-keys -X select-word \; send-keys -X copy-pipe 'pbcopy'
+
+# Triple-click to select and copy line (stays at current position)
+bind-key -n TripleClick1Pane select-pane \; copy-mode -M \; send-keys -X select-line \; send-keys -X copy-pipe 'pbcopy'
+
+# Enter copy mode
+bind [ copy-mode
+
+# Page up to enter copy mode and scroll up
+bind -n Pageup copy-mode -u
+
+# Search in copy mode
+bind-key -T copy-mode-vi / command-prompt -i -p "search down" "send -X search-forward-incremental \"%%%\""
+bind-key -T copy-mode-vi ? command-prompt -i -p "search up" "send -X search-backward-incremental \"%%%\""
+
+##############################
+### History & Buffer       ###
+##############################
+
+# Increase scrollback buffer size (developer standard)
+set -g history-limit 50000
 
 set -g default-terminal "screen-256color"
 
@@ -18,6 +60,37 @@ unbind -n Tab
 
 # make delay shorter
 set -sg escape-time 0
+
+##############################
+### Productivity Settings  ###
+##############################
+
+# Start window and pane indices at 1 (easier to reach)
+set -g base-index 1
+setw -g pane-base-index 1
+
+# Re-number windows when one is closed
+set -g renumber-windows on
+
+# Display messages for 2 seconds
+set -g display-time 2000
+
+# Enable focus events (useful for vim integration)
+set -g focus-events on
+
+# Don't rename windows automatically
+set -g allow-rename off
+
+##############################
+### Visual Feedback        ###
+##############################
+
+# Monitor activity in windows
+setw -g monitor-activity on
+set -g visual-activity off
+
+# Copy mode highlighting (yellow background for selection)
+set -g mode-style "fg=black,bg=yellow"
 
 # synchronize all panes in a window
 bind y setw synchronize-panes
@@ -29,15 +102,46 @@ bind k select-pane -U
 bind l select-pane -R
 
 ##############################
+### Pane & Window Mgmt     ###
+##############################
+
+# Pane resizing shortcuts (repeatable without prefix)
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
+# Split panes using | and - (more intuitive)
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+unbind '"'
+unbind %
+
+# Create new window with current path
+bind c new-window -c "#{pane_current_path}"
+
+# Move windows left/right
+bind -r "<" swap-window -t -1 -d
+bind -r ">" swap-window -t +1 -d
+
+##############################
 ### Color & Style Settings ###
 ##############################
 
 source ~/workspace/source-code/personal/dotfiles/tmux/theme.sh
 
+##############################
+### Plugin Configuration    ###
+##############################
+
+set -g @continuum-restore 'on'
+
 #########################TMP Plugins##################
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run -b '~/.tmux/plugins/tpm/tpm'

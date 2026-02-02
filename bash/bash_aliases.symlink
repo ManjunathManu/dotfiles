@@ -14,10 +14,6 @@ alias l='ls -CF'
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-alias startConda='docker run -i -t -p 8888:8888 continuumio/anaconda3 /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip='*' --port=8888 --no-browser --allow-root"'
-
-alias startRedis='docker run -d --rm -p 6379:6379 redis'
-
 # Create a new directory and enter it
 function mkd() {
     mkdir -p "$@" && cd "$_";
@@ -26,28 +22,16 @@ function mkd() {
 # Cd into work
 function work() {
   case $@ in
-    builder)
-      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/server-builder;
+    lisa)
+      cd ~/workspace/source-code/lightmetrics/python/chat-knowledge-base;
       ;;
 
-    fleet)
-      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/lm-api-fleet;
+    ttd)
+      cd ~/workspace/source-code/lightmetrics/python/conversational-bot;
       ;;
 
-    driver)
-      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/lm-api-driver;
-      ;;
-
-    asset)
-      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/lm-api-assets;
-      ;;
-
-    commons)
-      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/lm-api-commons;
-      ;;
-
-    locee)
-      cd ~/workspace/source-code/lightmetrics/nodejs/microservices/lm-api-location-intel;
+    python)
+      cd ~/workspace/source-code/lightmetrics/python;
       ;;
 
     white)
@@ -57,6 +41,11 @@ function work() {
     aws-utils)
       cd ~/workspace/source-code/lightmetrics/nodejs/aws-utils;
       ;;
+
+    general)
+      cd ~/workspace/general
+      ;;
+
     *)
       cd ~/workspace/source-code/lightmetrics;
   esac
@@ -131,11 +120,11 @@ alias baliases='vim ~/.bash_aliases'
 
 # *********************DOCKER********************
 
-alias doccouchbase='docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase/server'
+alias doc-conda='docker run -i -t -p 8888:8888 continuumio/anaconda3 /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip='*' --port=8888 --no-browser --allow-root"'
 
-alias docsyncgateway='docker run -p 4984:4984 -d couchbase/sync-gateway'
+alias doc-redis='docker run -d --rm -p 6379:6379 redis'
 
-alias docredis='docker run -d -p 6379:6379 redis'
+alias doc-openwebui='docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main'
 
 # ********************Nginx******************************
 
@@ -196,3 +185,68 @@ function exp-aws-profile() {
 }
 
 alias chrome="open -a 'Google Chrome'"
+
+# ******************* Claude code ************************
+alias cc='claude'
+
+fetch_ssm_to_env() {
+  # Ask for base path
+  read -p "Enter Parameter Store base path (e.g., /apistack-prod_usw2/llm-kb-db-api-server-qa/common/): " base_path
+
+  if [ -z "$base_path" ]; then
+    echo "Error: Parameter store base path cannot be empty"
+    return 1
+  fi
+
+  # Ask for region
+  read -p "Enter AWS region (e.g., us-west-2): " region
+
+  if [ -z "$region" ]; then
+    echo "Error: AWS region cannot be empty"
+    return 1
+  fi
+
+  echo ""
+  echo "Fetching parameters from ${base_path} in region ${region}..."
+  echo "----"
+
+  aws ssm get-parameters-by-path \
+    --path "${base_path}" \
+    --with-decryption \
+    --output text \
+    --region "$region" | sort | awk '{ sub("^.*/", "", $5); print $5"="$7 }'
+
+  echo "----"
+  if [ $? -eq 0 ]; then
+    echo "Successfully fetched parameters"
+  else
+    echo "Error: Failed to fetch parameters"
+    return 1
+  fi
+}
+
+### use a profile and export its creds
+sso() {
+  local profile="$1"
+
+  if [ -z "$profile" ]; then
+    echo "Usage: sso <profile-name>"
+    return 1
+  fi
+
+  echo "🔍 Checking credentials..."
+
+  if ! aws sts get-caller-identity --profile "$profile" --output json >/dev/null 2>&1; then
+    echo "🔑 SSO session missing or expired. Logging in..."
+    if ! aws sso login --profile "$profile"; then
+      echo "❌ Failed to login to AWS SSO"
+      return 1
+    fi
+  else
+    echo "✅ SSO session already active."
+  fi
+  # local res="$(aws configure export-credentials --profile "$profile" --format env)"
+  # echo res
+  eval "$(aws configure export-credentials --profile "$profile" --format env)"
+  echo "✅ AWS credentials exported for profile: $profile"
+}

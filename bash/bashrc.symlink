@@ -138,8 +138,6 @@ replicator ()
 }
 complete -F replicator replicator
 
-work
-
 complete -C /usr/bin/terraform terraform
 
 complete -C '/usr/local/bin/aws_completer' aws
@@ -178,14 +176,13 @@ if [ -f ~/.git-completion.bash ]; then
   . ~/.git-completion.bash
 fi
 
-# export PATH="/usr/node-v18.15.0/bin:$PATH"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Load Angular CLI autocompletion.
 source <(ng completion script)
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Copyright 2016 The Kubernetes Authors.
 #
@@ -542,3 +539,6 @@ source <(kubectl completion bash)
 # ex: ts=4 sw=4 et filetype=sh
 alias k=kubectl
 complete -F __start_kubectl k
+
+# uv
+export PATH="/Users/manju/.local/bin:$PATH"

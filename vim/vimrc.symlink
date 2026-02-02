@@ -2,6 +2,15 @@ set hidden
 
 set nocompatible
 
+" stops Vim from showing the current mode (like --- INSERT --- or --- NORMAL ---) in the default location (the bottom-left of the command line area), allowing vim-airline to handle the mode indicator within its own status bar.
+set noshowmode
+
+" stops Vim from displaying the filename in the command bar when opening a file.
+set shortmess+=F
+
+" To ensure vim-airline's status line is always displayed, even when only one window or buffer is open
+set laststatus=2
+
 " set the runtime path to include Vundle and initialize
 
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -34,60 +43,100 @@ autocmd FileType json syntax match Comment +\/\/.\+$+
 call vundle#begin()
 
 " let Vundle manage Vundle
-
 " "Plugin 'VundleVim/Vundle.vim'
-
 Plugin 'tpope/vim-fugitive'
-
 Plugin 'scrooloose/nerdtree'
-
 " Plugin 'w0rp/ale'
-
 Plugin 'ctrlpvim/ctrlp.vim'
-
 " typescript syntax highlighter
 Plugin 'leafgarland/typescript-vim'
-
 Plugin 'neoclide/coc.nvim', {'branch': 'release'}
-
 " Plugin 'valloric/youcompleteme'
-
 " Vim plugin for intensely orgasmic commenting
 Plugin 'scrooloose/nerdcommenter'
-
 Plugin 'lifepillar/vim-solarized8'
-
 Plugin 'mattn/emmet-vim'
-
 " Javascript syntax highlighting
 Plugin 'pangloss/vim-javascript'
-
 " Jsx syntax highlighting
 Plugin 'mxw/vim-jsx'
+Plugin 'github/copilot.vim'
 
-" Plugin 'vim-airline/vim-airline'
+" ---------------- Python IDE Enhancements ----------------
 
+" Better syntax highlighting, indentation, etc.
+Plugin 'vim-python/python-syntax'
+
+" Python code formatter (Black)
+Plugin 'psf/black'
+
+" Run Python unit tests inside Vim
+Plugin 'vim-test/vim-test'
+
+" Async runner for vim-test
+Plugin 'tpope/vim-dispatch'
+
+" Optional: show function/class outline in a side window
+Plugin 'preservim/tagbar'
+
+" Optional: better indentation detection
+Plugin 'tpope/vim-sleuth'
+
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'iamcco/markdown-preview.nvim'
 " Adds file type glyphs/icons to popular Vim plugins:
 " NERDTree, vim-airline, Powerline, Unite, vim-startify and more
 " Plugin 'ryanoasis/vim-devicons'
-
 " Theme
 " Plugin 'tomasiser/vim-code-dark'
-
 " Plugin 'heavenshell/vim-jsdoc'
-
 " Plugin 'tpope/vim-surround'
-
 " CSS/SASS/html color preview
 " Plugin 'gko/vim-coloresque'
-
-
 " All of your Plugins must be added before the following line
 call vundle#end()
 
 filetype plugin indent on
 
 " Put your non-Plugin stuff after this line
+
+
+" ******************** Python Virtual Environment ********************
+
+" Automatically detect and activate Python virtual environment
+function! s:SetPythonVirtualEnv()
+  " Check if CoC is loaded - silently skip if not ready
+  if !get(g:, 'coc_service_initialized', 0)
+    return
+  endif
+
+  " Look for common venv directories
+  let venv_dirs = ['venv', '.venv', 'env', '.env']
+  for venv_name in venv_dirs
+    let venv_python = getcwd() . '/' . venv_name . '/bin/python'
+    if filereadable(venv_python)
+      call coc#config('python.defaultInterpreterPath', venv_python)
+      " Silently set - no message
+      return
+    endif
+  endfor
+
+  " Fall back to pyenv shim - silently
+  call coc#config('python.defaultInterpreterPath', '/Users/manju/.pyenv/shims/python')
+endfunction
+
+" Auto-detect venv when opening Python files (only if CoC is loaded)
+augroup PythonVenv
+  autocmd!
+  " Wait for CoC to fully initialize before setting venv
+  autocmd User CocNvimInit if &filetype == 'python' | call s:SetPythonVirtualEnv() | endif
+  " Also try on FileType, but silently fails if CoC not ready
+  autocmd FileType python call timer_start(1000, {-> s:SetPythonVirtualEnv()})
+augroup END
+
+" Manual command to switch Python interpreter
+command! PythonSetVenv call s:SetPythonVirtualEnv()
 
 
 " ******************** VIM Options ********************
@@ -123,7 +172,7 @@ set tabstop=2 shiftwidth=2 expandtab
 
 " Folders to ignore in vimgrep search
 " Commma seperated list
-set wildignore+=**/node_modules/**,**/documentation/**,**/target/**,**/logs/**
+set wildignore+=**/node_modules/**,**/documentation/**,**/target/**,**/logs/**,**/venv/**,**/__pycache__/**
 " set wildignore+=**/documentation/**
 
 set foldmethod=indent
@@ -205,12 +254,36 @@ endif
 
 " ******************** air-line ********************
 
+let g:airline_powerline_fonts = 1
 
-" let g:airline_powerline_fonts = 1
-" let g:airline_theme = 'codedark'
-" let g:typescript_ignore_typescriptdoc = 1
+" Remove encoding, fileformat, filetype, etc.
+let g:airline_section_y = ''
+let g:airline_section_z = '%l:%c'
+
+" Optional: clean inactive windows too
+" let g:airline_inactive_collapse = 1
+
+" Don’t show Coc status (like Prettier, linting info, etc.)
+let g:airline#extensions#coc#enabled = 0
+
+" Hide file encoding and format (utf-8[unix])
+let g:airline_skip_empty_sections = 1
 
 
+let g:airline_theme = 'dark'
+let g:typescript_ignore_typescriptdoc = 1
+let g:airline_mode_map = {
+  \ '__' : '-',
+  \ 'n'  : 'NORMAL',
+  \ 'i'  : 'INSERT',
+  \ 'R'  : 'REPLACE',
+  \ 'v'  : 'VISUAL',
+  \ 'V'  : 'V-LINE',
+  \ 'c'  : 'COMMAND',
+  \ 's'  : 'SELECT',
+  \ 'S'  : 'S-LINE',
+  \ 't'  : 'TERMINAL'
+  \ }
 
 " ******************** Nerd-tree ********************
 
@@ -227,7 +300,7 @@ let g:NERDTreeMouseMode=3
 
 
 " Exclude node_modules during search
-let g:ctrlp_custom_ignore = '\v[\/](node_modules|target|dist)|(\.(swp|ico|git|svn))$'
+let g:ctrlp_custom_ignore = '\v[\/](node_modules|target|dist|venv|__pycache__)|(\.(swp|ico|git|svn))$'
 
 " Default file search 
 let g:ctrlp_by_filename=1
@@ -346,6 +419,36 @@ let g:javascript_plugin_ngdoc = 1
 
 let python_highlight_all = 1
 
+" Auto-detect indentation style for Python projects
+let g:python_recommended_style = 0
+
+" Format on save with CoC and Black
+autocmd BufWritePre *.py silent! :call CocAction('format')
+
+" Run the current Python file
+nnoremap <leader>r :!python3 %<CR>
+
+" Run Python file in virtual environment
+nnoremap <leader>R :!python %<CR>
+
+" vim-test mappings
+let test#strategy = "dispatch"
+let test#python#runner = 'pytest'
+nnoremap <leader>t :TestNearest<CR>
+nnoremap <leader>T :TestFile<CR>
+nnoremap <leader>a :TestSuite<CR>
+nnoremap <leader>l :TestLast<CR>
+
+" Show current Python interpreter
+nnoremap <leader>pi :CocCommand python.setInterpreter<CR>
+
+" Restart CoC (useful when switching projects)
+nnoremap <leader>cr :CocRestart<CR>
+
+nmap <F8> :TagbarToggle<CR>
+let g:tagbar_type_python = {
+  \ 'kinds': ['i:imports', 'c:classes', 'f:functions', 'm:members']
+  \ }
 
 " ********************* Java ****************************************
 let g:syntastic_java_checkers = []
@@ -361,9 +464,9 @@ let g:coc_global_extensions = [
   \ 'coc-eslint',
   \ 'coc-highlight',
   \ 'coc-html',
-  \ 'coc-python',
   \ 'coc-snippets',
-  \ 'coc-prettier'
+  \ 'coc-prettier',
+  \ 'coc-pyright',
   \]
 
 " Use :Prettier to format current buffer.
@@ -409,3 +512,8 @@ function! s:show_documentation()
     call CocAction('doHover')
   endif
 endfunction
+
+" Python-specific CoC commands
+command! PythonInterpreter :CocCommand python.setInterpreter
+command! PyrightOrganizeImports :CocCommand pyright.organizeimports
+command! PyrightRestartServer :CocCommand pyright.restartserver
