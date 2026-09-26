@@ -1,5 +1,7 @@
 *.swp
-*.swp
+
+# Stray installer downloads
+get-pip.py
 
 # Machine-local config (secrets, account IDs)
 *.local.sh
