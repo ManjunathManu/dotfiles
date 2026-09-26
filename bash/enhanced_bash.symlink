@@ -82,3 +82,79 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
   fd --type d --hidden --follow --exclude ".git" . "$1"
 }
+
+# ============================================
+# ENHANCED FZF GIT FUNCTIONS
+# ============================================
+
+# Fuzzy find and checkout git branch
+fzf-git-branch() {
+    local branches branch
+    branches=$(git branch --all | grep -v HEAD) &&
+    branch=$(echo "$branches" |
+        fzf-tmux -d 30% +m --ansi --preview 'git log --oneline --graph --date=short --color=always --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1)') &&
+    git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+# Fuzzy find git commits and show details
+fzf-git-log() {
+    local commits commit
+    commits=$(git log --color=always --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --reverse) &&
+    commit=$(echo "$commits" | fzf --ansi --no-sort --reverse --tiebreak=index \
+        --preview 'echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % git show --color=always % | delta') &&
+    echo -n $(echo "$commit" | sed "s/ .*//")
+}
+
+# Fuzzy find and kill processes
+fzf-kill() {
+    local pid
+    if [ "$UID" != "0" ]; then
+        pid=$(ps -f -u $UID | sed 1d | fzf -m --preview 'echo {}' --preview-window down:3:wrap | awk '{print $2}')
+    else
+        pid=$(ps -ef | sed 1d | fzf -m --preview 'echo {}' --preview-window down:3:wrap | awk '{print $2}')
+    fi
+
+    if [ "x$pid" != "x" ]; then
+        echo $pid | xargs kill -${1:-9}
+    fi
+}
+
+# Fuzzy find environment variables
+fzf-env() {
+    local out
+    out=$(env | fzf --height 40% --reverse --preview 'echo {}' --preview-window down:3:wrap)
+    if [ -n "$out" ]; then
+        echo "Selected: $out"
+        export $(echo "$out" | cut -d= -f1)="$(echo "$out" | cut -d= -f2-)"
+    fi
+}
+
+# Fuzzy find and preview files with bat
+fzf-preview() {
+    fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'
+}
+
+# Fuzzy search in files (using ripgrep)
+fzf-ripgrep() {
+    local selected
+    selected=$(rg --color=always --line-number --no-heading --smart-case "${*:-}" |
+        fzf --ansi \
+            --color "hl:-1:underline,hl+:-1:underline:reverse" \
+            --delimiter : \
+            --preview 'bat --color=always {1} --highlight-line {2}' \
+            --preview-window 'up,60%,border-bottom,+{2}+3/3,~3')
+    [ -n "$selected" ] && vim "+$(echo "$selected" | cut -d: -f2)" "$(echo "$selected" | cut -d: -f1)"
+}
+
+# Bind keybindings for FZF functions
+bind -x '"\C-b": fzf-git-branch'
+bind -x '"\C-y": fzf-git-log'
+bind -x '"\C-k": fzf-kill'
+
+# Alias for easy access
+alias fgb='fzf-git-branch'
+alias fgl='fzf-git-log'
+alias fk='fzf-kill'
+alias fenv='fzf-env'
+alias fp='fzf-preview'
+alias frg='fzf-ripgrep'

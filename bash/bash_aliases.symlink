@@ -10,6 +10,55 @@ alias la='ls -A'
 
 alias l='ls -CF'
 
+# ============================================
+# MODERN CLI TOOL ALIASES
+# ============================================
+
+# eza (modern ls) - only if installed
+if command -v eza &> /dev/null; then
+    alias ls='eza --icons --group-directories-first'
+    alias ll='eza -la --icons --git --group-directories-first'
+    alias la='eza -a --icons --group-directories-first'
+    alias lt='eza --tree --level=2 --icons'
+    alias lta='eza --tree --level=2 --icons --all'
+fi
+
+# ripgrep (better grep)
+if command -v rg &> /dev/null; then
+    alias grep='rg'
+fi
+
+# btop (better top)
+if command -v btop &> /dev/null; then
+    alias top='btop'
+fi
+
+# duf (better df)
+if command -v duf &> /dev/null; then
+    alias df='duf'
+fi
+
+# procs (better ps)
+if command -v procs &> /dev/null; then
+    alias ps='procs'
+fi
+
+# bat (better cat)
+if command -v bat &> /dev/null; then
+    alias cat='bat --paging=never'
+    alias catp='bat' # cat with pager
+fi
+
+# lazygit
+if command -v lazygit &> /dev/null; then
+    alias lg='lazygit'
+fi
+
+# zoxide (smart cd)
+if command -v zoxide &> /dev/null; then
+    alias cd='z'
+fi
+
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
