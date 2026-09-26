@@ -1,0 +1,33 @@
+# export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+. ~/.bashrc
+
+# export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
+
+# Load machine-local secrets (not tracked in git)
+[ -f ~/.secrets ] && . ~/.secrets
+
+# uv
+export PATH="/Users/manju/.local/bin:$PATH"
+
+# Python virtual environment activation shortcut
+venv() {
+    if [ -f "./venv/bin/activate" ]; then
+        source ./venv/bin/activate
+        echo "Activated venv"
+    elif [ -f "./.venv/bin/activate" ]; then
+        source ./.venv/bin/activate
+        echo "Activated .venv"
+    else
+        echo "No virtual environment found (checked ./venv and ./.venv)"
+        return 1
+    fi
+}
