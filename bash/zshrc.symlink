@@ -8,11 +8,66 @@ case $- in
       *) return;;
 esac
 
-# Git autocompletion
-autoload -Uz compinit && compinit
+# ============================================
+# ZSH PLUGINS (Manual Loading)
+# ============================================
 
+# Plugin directory
+ZSH_PLUGIN_DIR="${HOME}/.zsh-plugins"
+
+# Install plugins if not present
+if [ ! -d "$ZSH_PLUGIN_DIR" ]; then
+    mkdir -p "$ZSH_PLUGIN_DIR"
+fi
+
+# Install fast-syntax-highlighting
+if [ ! -d "$ZSH_PLUGIN_DIR/fast-syntax-highlighting" ]; then
+    git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$ZSH_PLUGIN_DIR/fast-syntax-highlighting"
+fi
+
+# Install zsh-autosuggestions
+if [ ! -d "$ZSH_PLUGIN_DIR/zsh-autosuggestions" ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions.git "$ZSH_PLUGIN_DIR/zsh-autosuggestions"
+fi
+
+# Install zsh-completions
+if [ ! -d "$ZSH_PLUGIN_DIR/zsh-completions" ]; then
+    git clone https://github.com/zsh-users/zsh-completions.git "$ZSH_PLUGIN_DIR/zsh-completions"
+fi
+
+# Install fzf-tab
+if [ ! -d "$ZSH_PLUGIN_DIR/fzf-tab" ]; then
+    git clone https://github.com/Aloxaf/fzf-tab.git "$ZSH_PLUGIN_DIR/fzf-tab"
+fi
+
+# Add homebrew completions to fpath (needed for non-login shells like tmux panes)
+if [[ -d /opt/homebrew/share/zsh/site-functions ]]; then
+    fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+fi
+
+# Add zsh-completions to fpath
+fpath=($ZSH_PLUGIN_DIR/zsh-completions/src $fpath)
+
+# Initialize completion system BEFORE loading plugins
+# -i: silently ignore insecure directories (common on macOS with homebrew)
+autoload -Uz compinit && compinit -i
 autoload -U +X bashcompinit && bashcompinit
-autoload -U +X compinit && compinit
+
+# Load plugins in correct order:
+# fzf-tab must be after compinit but before autosuggestions and syntax highlighting
+source "$ZSH_PLUGIN_DIR/fzf-tab/fzf-tab.plugin.zsh" 2>/dev/null
+source "$ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" 2>/dev/null
+source "$ZSH_PLUGIN_DIR/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" 2>/dev/null
+
+# Configure autosuggestions
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#666666"
+export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+bindkey '^ ' autosuggest-accept  # Ctrl+Space to accept
+
+# Fix backspace in middle of line (iTerm2 + tmux compatibility)
+bindkey '^?' backward-delete-char
+bindkey '^H' backward-delete-char
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -93,12 +148,18 @@ function prompt_short_dir() {
     echo "$result"
 }
 
-COLOR_DEF=$'%f'
-COLOR_USR=$'%F{green}'
-COLOR_DIR=$'%F{blue}'
-COLOR_GIT=$'%F{yellow}'
-setopt PROMPT_SUBST
-export PROMPT='${COLOR_USR}%n ${COLOR_DIR}$(prompt_short_dir)${COLOR_GIT} $(parse_git_branch)${COLOR_DEF}$ '
+# Initialize Starship prompt if available, otherwise use traditional prompt
+if command -v starship &> /dev/null; then
+    eval "$(starship init zsh)"
+else
+    # Traditional prompt fallback
+    COLOR_DEF=$'%f'
+    COLOR_USR=$'%F{green}'
+    COLOR_DIR=$'%F{blue}'
+    COLOR_GIT=$'%F{yellow}'
+    setopt PROMPT_SUBST
+    export PROMPT='${COLOR_USR}%n ${COLOR_DIR}$(prompt_short_dir)${COLOR_GIT} $(parse_git_branch)${COLOR_DEF}$ '
+fi
 
 # if [ "$color_prompt" = yes ]; then
   # PROMPT='%F{green}%n@%m%f:%F{blue}%~%u$(parse_git_branch)%F{yellow}%f% $ '
@@ -149,7 +210,7 @@ fi
 
 confirm() {
   # call with a prompt string or use a default
-  read -r -p "${1:-Are you sure? [y/N]} " response
+  read -r "response?${1:-Are you sure? [y/N]} "
   case "$response" in
     [yY][eE][sS]|[yY])
       true
@@ -166,9 +227,11 @@ replicator ()
 }
 complete -F _replicator replicator
 alias ic="ibmcloud"
-work
+# work  # Commented out - call manually when needed
 
-complete -C /usr/bin/terraform terraform
+if command -v terraform &> /dev/null; then
+    complete -C "$(which terraform)" terraform
+fi
 
 complete -C '/usr/local/bin/aws_completer' aws
 
@@ -197,7 +260,9 @@ export NVM_DIR="$HOME/.nvm"
 
 
 # Load Angular CLI autocompletion.
-source <(ng completion script)
+if command -v ng &> /dev/null; then
+    source <(ng completion script)
+fi
 
 # SSH autocompletion for zsh
 _ssh_hosts() {
@@ -227,6 +292,11 @@ export PATH="/Users/manju/.local/bin:$PATH"
 # ============================================
 # ENHANCED TERMINAL FEATURES
 # ============================================
+
+# Initialize zoxide (smart cd) if available
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+fi
 
 # Load enhanced zsh configuration
 if [ -f ~/.enhanced_zsh ]; then
