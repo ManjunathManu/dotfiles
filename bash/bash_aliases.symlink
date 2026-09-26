@@ -202,35 +202,35 @@ alias nginx-verify-config="sudo nginx -t"
 # Reload bashrc
 alias rbash='source ~/.bashrc'
 
+# ********************** AWS config ****************************
+
+# Account-specific values (profiles, TEAM settings) live in the gitignored
+# config/aws.local.sh; see config/aws.example.sh for the template.
+DOTFILES_DIR="$(dirname "$(dirname "$(readlink ~/.bash_aliases)")")"
+[ -f "$DOTFILES_DIR/config/aws.local.sh" ] && . "$DOTFILES_DIR/config/aws.local.sh"
+
 # ********************** export profile_name ****************************
 
 function exp-aws-profile() {
   h1 "exporting AWS_PROFILE..."
+  local profile
   case $@ in
-    dev)
-      info "export AWS_PROFILE=Lightmetrics-DevTestAccount-1_AdministratorAccess"
-      export AWS_PROFILE=Lightmetrics-DevTestAccount-1_AdministratorAccess
-      ;;
-
-    prod)
-      info "export AWS_PROFILE=Lightmetrics-ProductionAccount-1_AdministratorAccess"
-      export AWS_PROFILE=Lightmetrics-ProductionAccount-1_AdministratorAccess
-      ;;
-
-    master-prod)
-      info "export AWS_PROFILE=Lightmetrics-MasterProduction_PowerUserAccess"
-      export AWS_PROFILE=Lightmetrics-MasterProduction_PowerUserAccess
-      ;;
-
-    operations)
-      info "export AWS_PROFILE=Lightmetrics-OperationsAccount-1_AdministratorAccess"
-      export AWS_PROFILE=Lightmetrics-OperationsAccount-1_AdministratorAccess
-      ;;
-
+    dev)         profile="$AWS_PROFILE_DEV" ;;
+    prod)        profile="$AWS_PROFILE_PROD" ;;
+    master-prod) profile="$AWS_PROFILE_MASTER_PROD" ;;
+    operations)  profile="$AWS_PROFILE_OPERATIONS" ;;
     *)
       error "Invalid profile name: only [dev, prod, master-prod, operations] is allowed"
+      return 1
       ;;
   esac
+
+  if [ -z "$profile" ]; then
+    error "Profile for '$*' is not set in config/aws.local.sh"
+    return 1
+  fi
+  info "export AWS_PROFILE=$profile"
+  export AWS_PROFILE="$profile"
 }
 
 alias chrome="open -a 'Google Chrome'"
@@ -240,7 +240,7 @@ alias cc='claude'
 
 fetch_ssm_to_env() {
   # Ask for base path
-  read -p "Enter Parameter Store base path (e.g., /apistack-prod_usw2/llm-kb-db-api-server-qa/common/): " base_path
+  read -p "Enter Parameter Store base path (e.g., /my-app/prod/common/): " base_path
 
   if [ -z "$base_path" ]; then
     echo "Error: Parameter store base path cannot be empty"
@@ -298,4 +298,49 @@ sso() {
   # echo res
   eval "$(aws configure export-credentials --profile "$profile" --format env)"
   echo "✅ AWS credentials exported for profile: $profile"
+}
+
+# ********************** AWS TEAM Elevated Access ****************************
+
+team-request() {
+  local justification="${1}"
+  local duration="${2:-4}"
+
+  if [ -z "$justification" ]; then
+    error "Usage: team-request <justification> [duration_hours]"
+    return 1
+  fi
+  if [ -z "$TEAM_URL" ]; then
+    error "TEAM settings missing: create config/aws.local.sh from config/aws.example.sh"
+    return 1
+  fi
+
+  h1 "AWS TEAM Elevated Access Request"
+  info "Account:        $TEAM_ACCOUNT_ID"
+  info "Permission Set: $TEAM_PERMSET"
+  info "Duration:       ${duration}h"
+  info "Justification:  $justification"
+  info "Ticket:         $TEAM_TICKET"
+
+  # Delegate to automation script if available (reads the same config)
+  local script="$DOTFILES_DIR/bin/team-request"
+  if [ -x "$script" ]; then
+    "$script" "$justification" "$duration"
+    return $?
+  fi
+
+  # Fallback: open browser
+  info "Opening TEAM portal in browser..."
+  open "$TEAM_URL"
+  echo ""
+  info "After submitting the request, run: team-activate"
+}
+
+team-activate() {
+  h1 "Activating TEAM elevated access..."
+  sso "$TEAM_SSO_PROFILE"
+  if [ $? -eq 0 ]; then
+    success "TEAM elevated access is active"
+    aws sts get-caller-identity --output table
+  fi
 }

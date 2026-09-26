@@ -35,6 +35,7 @@ All scripts use helper functions from `utils.sh` for consistent output formattin
 - `vim/` - Vim configuration using Vundle plugin manager
 - `install/` - Installation scripts for environment setup
 - `bin/` - Custom executable scripts
+- `config/` - Machine-local settings: `*.local.sh` files are gitignored; `aws.example.sh` is the template for `aws.local.sh` (AWS profiles, TEAM settings)
 - `utils.sh` - Shared bash utility functions for styled output and command execution
 
 ## Key Commands

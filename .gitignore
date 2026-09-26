@@ -1,2 +1,5 @@
 *.swp
 *.swp
+
+# Machine-local config (secrets, account IDs)
+*.local.sh
