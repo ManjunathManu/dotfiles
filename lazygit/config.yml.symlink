@@ -1,0 +1,221 @@
+# Lazygit Configuration
+# Modern terminal UI for git commands
+# Documentation: https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
+
+gui:
+  # Increase window size
+  windowSize: 'normal'
+  # Show command log
+  showCommandLog: true
+  # Show file tree
+  showFileTree: true
+  # Show random tip on startup
+  showRandomTip: true
+  # Show bottom line
+  showBottomLine: true
+  # Show icons
+  nerdFontsVersion: "3"
+  # Theme
+  theme:
+    activeBorderColor:
+      - green
+      - bold
+    inactiveBorderColor:
+      - white
+    optionsTextColor:
+      - blue
+    selectedLineBgColor:
+      - blue
+    selectedRangeBgColor:
+      - blue
+
+git:
+  # Use delta for diffs
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+  # Auto-fetch interval (in seconds, 0 to disable)
+  autoFetch: true
+  autoRefresh: true
+  # Branch sorting order
+  branchLogCmd: "git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --"
+  # All branches log command
+  allBranchesLogCmd: "git log --graph --all --color=always --abbrev-commit --decorate --date=relative --pretty=medium"
+  # Disable force-pushing by default (safety)
+  skipHookPrefix: WIP
+  # Main branches (protected from certain operations)
+  mainBranches: [master, main]
+
+# Keybindings customization
+keybinding:
+  universal:
+    quit: 'q'
+    quit-alt1: '<c-c>'
+    return: '<esc>'
+    quitWithoutChangingDirectory: 'Q'
+    togglePanel: '<tab>'
+    prevItem: '<up>'
+    nextItem: '<down>'
+    prevItem-alt: 'k'
+    nextItem-alt: 'j'
+    prevPage: ','
+    nextPage: '.'
+    scrollLeft: 'H'
+    scrollRight: 'L'
+    gotoTop: '<'
+    gotoBottom: '>'
+    toggleRangeSelect: 'v'
+    rangeSelectDown: '<s-down>'
+    rangeSelectUp: '<s-up>'
+    prevBlock: '<left>'
+    nextBlock: '<right>'
+    prevBlock-alt: 'h'
+    nextBlock-alt: 'l'
+    nextMatch: 'n'
+    prevMatch: 'N'
+    startSearch: '/'
+    optionMenu: 'x'
+    optionMenu-alt1: '?'
+    select: '<space>'
+    goInto: '<enter>'
+    confirm: '<enter>'
+    confirm-alt1: 'y'
+    remove: 'd'
+    new: 'n'
+    edit: 'e'
+    openFile: 'o'
+    scrollUpMain: '<pgup>'
+    scrollDownMain: '<pgdown>'
+    scrollUpMain-alt1: 'K'
+    scrollDownMain-alt1: 'J'
+    scrollUpMain-alt2: '<c-u>'
+    scrollDownMain-alt2: '<c-d>'
+    executeCustomCommand: ':'
+    createRebaseOptionsMenu: 'm'
+    pushFiles: 'P'
+    pullFiles: 'p'
+    refresh: 'R'
+    createPatchOptionsMenu: '<c-p>'
+    nextTab: ']'
+    prevTab: '['
+    nextScreenMode: '+'
+    prevScreenMode: '_'
+    undo: 'z'
+    redo: '<c-z>'
+    filteringMenu: '<c-s>'
+    diffingMenu: 'W'
+    diffingMenu-alt: '<c-e>'
+    copyToClipboard: '<c-o>'
+    openRecentRepos: '<c-r>'
+    submitEditorText: '<enter>'
+    extrasMenu: '@'
+    toggleWhitespaceInDiffView: '<c-w>'
+    increaseContextInDiffView: '}'
+    decreaseContextInDiffView: '{'
+
+  files:
+    commitChanges: 'c'
+    commitChangesWithoutHook: 'w'
+    amendLastCommit: 'A'
+    commitChangesWithEditor: 'C'
+    findBaseCommitForFixup: '<c-f>'
+    confirmDiscard: 'x'
+    ignoreFile: 'i'
+    refreshFiles: 'r'
+    stashAllChanges: 's'
+    viewStashOptions: 'S'
+    toggleStagedAll: 'a'
+    viewResetOptions: 'D'
+    fetch: 'f'
+    toggleTreeView: '`'
+    openMergeTool: 'M'
+    openStatusFilter: '<c-b>'
+
+  branches:
+    createPullRequest: 'o'
+    viewPullRequestOptions: 'O'
+    copyPullRequestURL: '<c-y>'
+    checkoutBranchByName: 'c'
+    forceCheckoutBranch: 'F'
+    rebaseBranch: 'r'
+    renameBranch: 'R'
+    mergeIntoCurrentBranch: 'M'
+    viewGitFlowOptions: 'i'
+    fastForward: 'f'
+    createTag: 'T'
+    pushTag: 'P'
+    setUpstream: 'u'
+    fetchRemote: 'f'
+
+  commits:
+    squashDown: 's'
+    renameCommit: 'r'
+    renameCommitWithEditor: 'R'
+    viewResetOptions: 'g'
+    markCommitAsFixup: 'f'
+    createFixupCommit: 'F'
+    squashAboveCommits: 'S'
+    moveDownCommit: '<c-j>'
+    moveUpCommit: '<c-k>'
+    amendToCommit: 'A'
+    pickCommit: 'p'
+    revertCommit: 't'
+    cherryPickCopy: 'c'
+    cherryPickCopyRange: 'C'
+    pasteCommits: 'v'
+    tagCommit: 'T'
+    checkoutCommit: '<space>'
+    resetCherryPick: '<c-R>'
+    copyCommitMessageToClipboard: '<c-y>'
+    openLogMenu: '<c-l>'
+    viewBisectOptions: 'b'
+
+  stash:
+    popStash: 'g'
+    renameStash: 'r'
+
+  commitFiles:
+    checkoutCommitFile: 'c'
+
+  main:
+    toggleDragSelect: 'v'
+    toggleDragSelect-alt: 'V'
+    toggleSelectHunk: 'a'
+    pickBothHunks: 'b'
+
+  submodules:
+    init: 'i'
+    update: 'u'
+    bulkMenu: 'b'
+
+# Custom commands
+customCommands:
+  - key: '<c-t>'
+    command: "git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)"
+    context: 'global'
+    description: 'Push current branch and set upstream'
+
+  - key: 'E'
+    command: 'git commit --allow-empty -m "Empty commit"'
+    context: 'global'
+    description: 'Create empty commit'
+
+# Update check
+update:
+  method: prompt
+  days: 14
+
+# Confirmation prompts
+confirmOnQuit: false
+
+# Disable ASCII logo
+disableStartupPopups: false
+
+# Notification on background operations
+notARepository: 'prompt'
+
+# Command log size
+commandLogSize: 8
+
+# Split diff view
+splitDiff: 'auto'

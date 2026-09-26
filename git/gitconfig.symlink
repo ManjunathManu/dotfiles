@@ -1,0 +1,77 @@
+# Git Configuration with Delta Integration
+# This config uses delta for enhanced diff viewing
+# Include local git config (created by install/git.sh) for user credentials
+
+[include]
+    # Include existing git configuration from interactive setup
+    path = ~/.gitconfig.local
+
+[core]
+    pager = delta
+    editor = vim
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    # Enable line numbers
+    line-numbers = true
+    # Use side-by-side view for easier comparison
+    side-by-side = true
+    # Navigate between diff sections with n/N
+    navigate = true
+    # Syntax highlighting theme (compatible with dark terminals)
+    syntax-theme = Monokai Extended
+    # Show file paths in the header
+    file-style = bold yellow
+    file-decoration-style = none
+    # Highlight changes within lines
+    hunk-header-decoration-style = blue box
+    hunk-header-file-style = red
+    hunk-header-line-number-style = "#067a00"
+    hunk-header-style = file line-number syntax
+    # Customize added/removed line styles
+    minus-style = syntax "#3f0001"
+    minus-emph-style = syntax "#900000"
+    plus-style = syntax "#003800"
+    plus-emph-style = syntax "#006000"
+    # Configure whitespace error highlighting
+    whitespace-error-style = 22 reverse
+    # Show line numbers in left margin
+    line-numbers-left-format = "{nm:>4}│"
+    line-numbers-right-format = "{np:>4}│"
+    line-numbers-left-style = cyan
+    line-numbers-right-style = cyan
+    line-numbers-minus-style = 124
+    line-numbers-plus-style = 28
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default
+    # Use delta for git diff
+    tool = delta
+
+[pager]
+    diff = delta
+    log = delta
+    reflog = delta
+    show = delta
+
+[alias]
+    # Enhanced diff aliases using delta
+    d = diff
+    ds = diff --staged
+    dc = diff --cached
+    # Interactive log viewer
+    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    # Show log with delta for each commit
+    logp = log -p
+    # Show beautiful branch graph
+    tree = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+[init]
+	defaultBranch = main
+[user]
+	name = Manjunath
+	email = manjunath.manu@lightmetrics.co
