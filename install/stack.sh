@@ -125,6 +125,18 @@ else
   success "Nginx is already installed"
 fi
 
+# ============================================
+# MODERN CLI TOOLS INSTALLATION
+# ============================================
+
+# Install Starship (modern prompt)
+h2 "Installing Starship prompt"
+if typeExists starship; then
+    success "starship already installed"
+else
+    runCommand "brew install starship" "Failed to install starship" "starship installed successfully"
+fi
+
 # Install fd (faster alternative to find)
 h2 "Installing fd (find alternative)"
 if typeExists fd; then
@@ -139,4 +151,94 @@ if typeExists bat; then
     success "bat already installed"
 else
     runCommand "brew install bat" "Failed to install bat" "bat installed successfully"
+fi
+
+# Install eza (modern ls replacement)
+h2 "Installing eza (ls alternative)"
+if typeExists eza; then
+    success "eza already installed"
+else
+    runCommand "brew install eza" "Failed to install eza" "eza installed successfully"
+fi
+
+# Install ripgrep (faster grep)
+h2 "Installing ripgrep (grep alternative)"
+if typeExists rg; then
+    success "ripgrep already installed"
+else
+    runCommand "brew install ripgrep" "Failed to install ripgrep" "ripgrep installed successfully"
+fi
+
+# Install delta (better git diffs)
+h2 "Installing delta (git diff tool)"
+if typeExists delta; then
+    success "delta already installed"
+else
+    runCommand "brew install git-delta" "Failed to install delta" "delta installed successfully"
+fi
+
+# Install zoxide (smart cd)
+h2 "Installing zoxide (smart cd)"
+if typeExists zoxide; then
+    success "zoxide already installed"
+else
+    runCommand "brew install zoxide" "Failed to install zoxide" "zoxide installed successfully"
+fi
+
+# Install lazygit (terminal UI for git)
+h2 "Installing lazygit"
+if typeExists lazygit; then
+    success "lazygit already installed"
+else
+    runCommand "brew install lazygit" "Failed to install lazygit" "lazygit installed successfully"
+fi
+
+# Install btop (better top)
+h2 "Installing btop (system monitor)"
+if typeExists btop; then
+    success "btop already installed"
+else
+    runCommand "brew install btop" "Failed to install btop" "btop installed successfully"
+fi
+
+# Install duf (better df)
+h2 "Installing duf (disk usage tool)"
+if typeExists duf; then
+    success "duf already installed"
+else
+    runCommand "brew install duf" "Failed to install duf" "duf installed successfully"
+fi
+
+# Install procs (better ps)
+h2 "Installing procs (process viewer)"
+if typeExists procs; then
+    success "procs already installed"
+else
+    runCommand "brew install procs" "Failed to install procs" "procs installed successfully"
+fi
+
+# Install tldr (simplified man pages)
+h2 "Installing tldr (man page alternative)"
+if typeExists tldr; then
+    success "tldr already installed"
+else
+    runCommand "brew install tldr" "Failed to install tldr" "tldr installed successfully"
+fi
+
+# Install hyperfine (benchmarking tool)
+h2 "Installing hyperfine (benchmarking tool)"
+if typeExists hyperfine; then
+    success "hyperfine already installed"
+else
+    runCommand "brew install hyperfine" "Failed to install hyperfine" "hyperfine installed successfully"
+fi
+
+# Install fzf (fuzzy finder) - likely already installed but ensure it's there
+h2 "Installing fzf (fuzzy finder)"
+if typeExists fzf; then
+    success "fzf already installed"
+else
+    runCommand "brew install fzf" "Failed to install fzf" "fzf installed successfully"
+    # Install fzf key bindings and fuzzy completion
+    runCommand "$(brew --prefix)/opt/fzf/install --all" "Failed to install fzf bindings" "fzf bindings installed successfully"
 fi
