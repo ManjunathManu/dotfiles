@@ -82,6 +82,7 @@ tmux source-file ~/.tmux.conf
 ### Shell Configuration
 
 Both bash and zsh configurations are maintained:
+
 - `bashrc.symlink` / `zshrc.symlink` - Main shell configuration
 - `bash_aliases.symlink` / `zsh_aliases.symlink` - Command aliases
 - SSH and kubectl autocompletion enabled in bashrc
@@ -111,6 +112,7 @@ Both bash and zsh configurations are maintained:
 ### Platform Differences
 
 The repository supports both macOS and Linux:
+
 - macOS-specific: Uses `pbcopy`/`pbpaste` for clipboard in tmux
 - Linux-specific: Some package installation commands may differ (commented out brew references suggest migration from apt-get)
 - Git credential helper automatically selects `osxkeychain` for macOS, `cache` or `store` for Linux
@@ -118,3 +120,7 @@ The repository supports both macOS and Linux:
 ## Current State
 
 The repository is configured for macOS (branch: `mac`), with some Linux-specific code commented out in installation scripts. Recent work includes updates to bash configuration for SSH/kubectl autocompletion and tmux theme customizations.
+
+## Quick Questions section
+
+- For vim/neovim configuration questions, start by stating the answer directly, then offer to explore config files if the user wants implementation help.
