@@ -87,10 +87,9 @@ checkVariableExistence() {
 }
 
 typeExists() {
-	if [ $(type -P $1) ]; then
-		return 0
-	fi
-	return 1
+	# Compatible with both bash and zsh
+	command -v "$1" >/dev/null 2>&1
+	return $?
 }
 
 jsonValue() {
@@ -100,34 +99,19 @@ jsonValue() {
 }
 
 vercomp() {
-	if [[ $1 == $2 ]]
-	then
+	# Simplified version comparison compatible with bash and zsh
+	if [[ $1 == $2 ]]; then
 		return 0
 	fi
-	local IFS=.
-	local i ver1=($1) ver2=($2)
 
-	# fill empty fields in ver1 with zeros
-	for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
-	do
-		ver1[i]=0
-	done
+	# Convert versions to comparable format
+	local v1=$(echo "$1" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }')
+	local v2=$(echo "$2" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }')
 
-	for ((i=0; i<${#ver1[@]}; i++))
-	do
-		if [[ -z ${ver2[i]} ]]
-		then
-			# fill empty fields in ver2 with zeros
-			ver2[i]=0
-		fi
-		if ((10#${ver1[i]} > 10#${ver2[i]}))
-		then
-			return 1
-		fi
-		if ((10#${ver1[i]} < 10#${ver2[i]}))
-		then
-			return 2
-		fi
-	done
+	if [[ $v1 -gt $v2 ]]; then
+		return 1
+	elif [[ $v1 -lt $v2 ]]; then
+		return 2
+	fi
 	return 0
 }
