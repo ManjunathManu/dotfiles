@@ -352,3 +352,18 @@ team-activate() {
     aws sts get-caller-identity --output table
   fi
 }
+
+# Python virtual environment activation shortcut
+venv() {
+  if [ -f "./venv/bin/activate" ]; then
+    source ./venv/bin/activate
+    echo "Activated venv"
+  elif [ -f "./.venv/bin/activate" ]; then
+    source ./.venv/bin/activate
+    echo "Activated .venv"
+  else
+    echo "No virtual environment found (checked ./venv and ./.venv)"
+    return 1
+  fi
+}
+
