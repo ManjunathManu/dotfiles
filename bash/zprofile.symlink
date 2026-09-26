@@ -2,7 +2,8 @@
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-. ~/.zshrc
+# Add Visual Studio Code (code)
+export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 
 # export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
