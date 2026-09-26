@@ -198,6 +198,11 @@ set wildmenu
 " Uncomment below line to hightlight the work being searched
 " set hlsearch
 
+" Highlight matching parenthesis/brackets
+set showmatch
+" How many tenths of a second to blink when matching brackets
+set matchtime=2
+
 
 " ******************** Key Binding ********************
 
