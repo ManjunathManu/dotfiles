@@ -80,6 +80,8 @@ brew "docker"
 brew "go-swagger/go-swagger/go-swagger"
 brew "localazy/tools/localazy"
 brew "pinecone-io/tap/pinecone"
+brew "k9s"                # terminal UI for Kubernetes clusters
+brew "stern"              # tail logs from many pods at once
 cask "ngrok"
 # kubectl and the AWS CLI are installed from their official .pkg installers in
 # /usr/local/bin. To manage them with Homebrew instead, uncomment and remove

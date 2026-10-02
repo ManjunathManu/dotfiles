@@ -1,16 +1,10 @@
-# shellcheck shell=bash disable=SC2034  # sourced template: variables are used by zsh_aliases
+# shellcheck shell=bash disable=SC2034  # sourced template: variables are used by bin/team-request
 # AWS / TEAM configuration
 #
 # Copy to config/aws.local.sh (gitignored) and fill in real values:
 #   cp config/aws.example.sh config/aws.local.sh
 #
 # Sourced by bash/zsh aliases and bin/team-request.
-
-# ---------- AWS SSO profiles (used by exp-aws-profile) ----------
-AWS_PROFILE_DEV="MyOrg-DevAccount_AdministratorAccess"
-AWS_PROFILE_PROD="MyOrg-ProductionAccount_AdministratorAccess"
-AWS_PROFILE_MASTER_PROD="MyOrg-MasterProduction_PowerUserAccess"
-AWS_PROFILE_OPERATIONS="MyOrg-OperationsAccount_AdministratorAccess"
 
 # ---------- AWS TEAM elevated access (team-request / team-activate) ----------
 # TEAM portal request page

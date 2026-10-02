@@ -32,6 +32,18 @@ if [[ $configGit =~ ^([Yy])$ ]]; then
   git config --file "$LOCAL" github.user "${github:-$defaultGithub}"
   git config --file "$LOCAL" core.editor "${editor:-$defaultGitEditor}"
 
+  # Different email for personal repos, chosen by folder (includeIf gitdir).
+  # git config appends the section at the end, after [user], so it wins there.
+  PERSONAL_DIR="$HOME/workspace/source-code/personal/"
+  defaultPersonal=$( git config --file "$HOME/.gitconfig.personal" user.email 2>/dev/null )
+  read -rp "Email for repos under ${PERSONAL_DIR/#$HOME/\~} (blank to skip) [$defaultPersonal] " personal
+  personal="${personal:-$defaultPersonal}"
+  if [ -n "$personal" ]; then
+    git config --file "$HOME/.gitconfig.personal" user.email "$personal"
+    chmod 600 "$HOME/.gitconfig.personal"
+    git config --file "$LOCAL" "includeIf.gitdir:$PERSONAL_DIR.path" "$HOME/.gitconfig.personal"
+  fi
+
   if [[ "$( uname )" == "Darwin" ]]; then
     git config --file "$LOCAL" credential.helper "osxkeychain"
   else

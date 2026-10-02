@@ -114,12 +114,6 @@ function sec_grp_update(){
   `which node $HOME/workspace/source-code/lightmetrics/nodejs/misc/aws-utils/src/update-sg.js` $1;
 }
 
-# Update AWS SSO credentials
-function init_aws_sso(){
-  echo "Initiating AWS SSO login..."
-  `which node` $HOME/workspace/source-code/lightmetrics/nodejs/misc/aws-sso-creds-tool/app.js;
-}
-
 # *****************TMUX*******************
 
 # Start tmux
@@ -237,30 +231,6 @@ alias rzsh='source ~/.zshrc'
 # config/aws.local.sh; see config/aws.example.sh for the template.
 DOTFILES_DIR="${${:-$HOME/.zsh_aliases}:A:h:h}"   # resolve symlink → repo root, no subshells
 [ -f "$DOTFILES_DIR/config/aws.local.sh" ] && . "$DOTFILES_DIR/config/aws.local.sh"
-
-# ********************** export profile_name ****************************
-
-function exp-aws-profile() {
-  h1 "exporting AWS_PROFILE..."
-  local profile
-  case $@ in
-    dev)         profile="$AWS_PROFILE_DEV" ;;
-    prod)        profile="$AWS_PROFILE_PROD" ;;
-    master-prod) profile="$AWS_PROFILE_MASTER_PROD" ;;
-    operations)  profile="$AWS_PROFILE_OPERATIONS" ;;
-    *)
-      error "Invalid profile name: only [dev, prod, master-prod, operations] is allowed"
-      return 1
-      ;;
-  esac
-
-  if [ -z "$profile" ]; then
-    error "Profile for '$*' is not set in config/aws.local.sh"
-    return 1
-  fi
-  info "export AWS_PROFILE=$profile"
-  export AWS_PROFILE="$profile"
-}
 
 alias chrome="open -a 'Google Chrome'"
 

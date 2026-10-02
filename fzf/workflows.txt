@@ -14,9 +14,9 @@ git reset --soft HEAD~1 | git reset | Undo last commit, keep changes
 git clean -fd | git clean | Remove untracked files and directories
 
 # AWS Commands
-exp-aws-profile dev | AWS profile | Switch to dev AWS profile
-exp-aws-profile prod | AWS profile | Switch to prod AWS profile
-sso PROFILE | AWS SSO | AWS SSO login
+sso dev | AWS SSO | Log in and export credentials for dev
+sso prod | AWS SSO | Log in and export credentials for prod
+sso mprod | AWS SSO | Log in and export credentials for master-prod
 fetch_ssm_to_env | SSM | Fetch SSM parameters to environment
 aws s3 ls | S3 | List S3 buckets
 aws ec2 describe-instances | EC2 | List EC2 instances
