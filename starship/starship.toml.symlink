@@ -10,7 +10,7 @@
 #     them, kube context only in Kubernetes folders (red for prod contexts).
 #   - Icons are Nerd Font codepoints by name (nerdfonts.com/cheat-sheet).
 #
-#   lm-commons  master [!2?1] 󰏗 v0.1.5 󰎙 22.22.0 󰸏 dev           took 3s
+#   lm-commons  master [!2?1] +42 -7 󰏗 v0.1.5 󰎙 22.22.0 󰸏 dev   ✘ 1 took 3s
 #   ❯                    (❮ in vi normal mode, red after a failed command)
 
 "$schema" = 'https://starship.rs/config-schema.json'
@@ -24,6 +24,7 @@ $directory\
 $git_branch\
 $git_state\
 $git_status\
+$git_metrics\
 $package\
 $nodejs\
 $python\
@@ -41,7 +42,7 @@ $line_break\
 $jobs\
 $character"""
 
-right_format = "$cmd_duration"
+right_format = "$status$cmd_duration"
 
 # ── Prompt character: vi mode + last exit status ─────────────────────────────
 [character]
@@ -92,6 +93,15 @@ modified = "!${count}"
 staged = "+${count}"
 renamed = "»${count}"
 deleted = "✘${count}"
+
+[git_metrics]
+# Lines added/removed in uncommitted changes, e.g. "+42 -7"
+disabled = false
+format = "([+$added]($added_style) )([-$deleted]($deleted_style) )"
+added_style = "bold green"
+deleted_style = "bold red"
+only_nonzero_diffs = true
+ignore_submodules = true
 
 # ── Project version (package.json, pyproject.toml, Cargo.toml, ...) ─────────
 [package]
@@ -177,6 +187,14 @@ format = "[$env_value]($style) "
 style = "bold red"
 
 # ── Feedback ─────────────────────────────────────────────────────────────────
+[status]
+# Exit code of a failed command (right side), with the signal name when
+# there is one: "✘ 127", "✘ 130 INT" (Ctrl+C). Hidden after success.
+disabled = false
+format = "[✘ $status( $signal_name)]($style) "
+style = "bold red"
+recognize_signal_code = true
+
 [cmd_duration]
 min_time = 2_000
 format = "[took $duration]($style)"
