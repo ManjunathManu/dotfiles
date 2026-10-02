@@ -135,6 +135,19 @@ alias tks='tmux kill-session'
 # List all tmux sessions
 alias tls='tmux list-sessions'
 
+# *****************GIT HOOKS*******************
+
+# `pre-commit install` refuses while the global core.hooksPath is set (the
+# gitleaks dispatcher in git/git-hooks.symlink). Install into .git/hooks
+# anyway: the dispatcher runs it after gitleaks.
+pre-commit() {
+  if [[ $1 == install ]]; then
+    GIT_CONFIG_GLOBAL=/dev/null command pre-commit "$@"
+  else
+    command pre-commit "$@"
+  fi
+}
+
 # *****************KITTY*******************
 
 # SSH that copies kitty's terminfo + shell integration to the remote host

@@ -1,0 +1,32 @@
+# Checks that run on every commit in this repo (it's public on GitHub).
+#   pre-commit install            # once per clone (install.sh does it)
+#   pre-commit run --all-files    # check everything now
+#   pre-commit autoupdate         # bump the pinned versions below
+# Skip in an emergency: git commit --no-verify
+repos:
+  # Block secrets: AWS keys, tokens, private keys, passwords in URLs, ...
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  # Shell script bugs (quoting, word splitting, unused/undefined vars, ...)
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
+    hooks:
+      - id: shellcheck
+        args: ["--severity=warning", "--external-sources"]
+        # shellcheck can't parse zsh; tmux/*.sh are tmux config, not shell;
+        # install_nvm.sh is the old vendored nvm installer (superseded by mise)
+        exclude_types: [zsh]
+        exclude: ^(tmux/|install_nvm\.sh$)
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-toml

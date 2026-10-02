@@ -3,7 +3,9 @@
 PS3="Please choose your session: "
 
 # Get a list of Tmux sessions
-sessions=($(tmux list-sessions -F "#S" 2>/dev/null))
+# while-read, not mapfile: macOS /bin/bash is 3.2
+sessions=()
+while IFS= read -r s; do sessions+=("$s"); done < <(tmux list-sessions -F "#S" 2>/dev/null)
 options=("${sessions[@]}" "New Session")
 
 echo "Available sessions"

@@ -51,6 +51,13 @@ brew "git"
 brew "git-delta"          # diff pager (themes in git/gitconfig.symlink)
 brew "lazygit"
 brew "gh"
+brew "gitleaks"           # secret scanning: global pre-commit hook (git/git-hooks.symlink)
+# pre-commit itself is installed with `uv tool` (install/stack.sh): Homebrew's
+# pre-commit runs on python@3.14, whose pyexpat needs a newer macOS than 26.0
+
+# ── Shell script quality ─────────────────────────────────────────────────────
+brew "shellcheck"
+brew "shfmt"
 
 # ── Editors & language servers ───────────────────────────────────────────────
 brew "neovim"

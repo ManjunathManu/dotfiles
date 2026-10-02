@@ -28,7 +28,8 @@ if ! typeExists mise; then
 fi
 runCommand "mise install" "Failed to install Node/Python with mise" "Node + Python installed"
 # Put those versions on PATH for the rest of this script (brew bundle's npm entries)
-export PATH="$(mise bin-paths | tr '\n' ':')$PATH"
+MISE_PATHS=$(mise bin-paths | tr '\n' ':')
+export PATH="$MISE_PATHS$PATH"
 success "node $(node -v), npm $(npm -v), $(python3 --version)"
 
 h2 "Brewfile packages"
@@ -40,3 +41,13 @@ info "brew bundle --file=$DOTFILES_DIR/Brewfile (this can take a while)"
 brew bundle --file="$DOTFILES_DIR/Brewfile" \
   || { error "brew bundle failed. Fix the error above, then re-run: brew bundle --file=$DOTFILES_DIR/Brewfile"; exit 1; }
 success "Brewfile packages installed"
+
+h2 "pre-commit"
+# Via uv on mise's Python (see Brewfile note on Homebrew's python@3.14)
+if ! typeExists pre-commit; then
+  runCommand "uv tool install pre-commit --python \"$(mise which python3)\"" \
+    "Failed to install pre-commit" "pre-commit installed"
+fi
+# GIT_CONFIG_GLOBAL=/dev/null: pre-commit refuses to install while the global
+# core.hooksPath (our hook dispatcher) is set; the dispatcher runs it anyway
+runCommand "GIT_CONFIG_GLOBAL=/dev/null pre-commit install" "Failed to install this repo's pre-commit hooks" "pre-commit hooks installed for dotfiles"

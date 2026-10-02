@@ -9,6 +9,10 @@
 [core]
     pager = delta
     editor = vim
+    # Global hooks for every repo: gitleaks on pre-commit, then the repo's own
+    # .git/hooks (see git/git-hooks.symlink/_dispatch). Repos with their own
+    # core.hooksPath (husky) keep using theirs.
+    hooksPath = ~/.git-hooks
 
 [interactive]
     diffFilter = delta --color-only

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Global git hooks: core.hooksPath = ~/.git-hooks (git/gitconfig.symlink).
+#
+# With core.hooksPath set, git ignores each repo's .git/hooks, so every hook
+# name in this folder is a link to this script, which:
+#   1. pre-commit only: blocks staged secrets with gitleaks
+#   2. then runs the repo's own .git/hooks/<name>, if any (same args + stdin)
+# Repos that set their own core.hooksPath (e.g. husky's .husky) override this
+# and never run these hooks.
+#
+# False positive? Add `# gitleaks:allow` to the line, or skip once with:
+#   SKIP_GITLEAKS=1 git commit ...
+
+hook=$(basename "$0")
+
+if [ "$hook" = "pre-commit" ] && [ -z "${SKIP_GITLEAKS:-}" ] && command -v gitleaks >/dev/null 2>&1; then
+  if ! gitleaks git --pre-commit --staged --redact --no-banner --log-level warn; then
+    echo "" >&2
+    echo "✋ gitleaks found a possible secret in the staged changes (details above, redacted)." >&2
+    echo "   Remove it and commit again. False positive: add '# gitleaks:allow' to that line," >&2
+    echo "   or skip once with: SKIP_GITLEAKS=1 git commit ..." >&2
+    exit 1
+  fi
+fi
+
+repo_hook="$(git rev-parse --git-common-dir 2>/dev/null)/hooks/$hook"
+if [ -x "$repo_hook" ]; then
+  exec "$repo_hook" "$@"
+fi
+exit 0

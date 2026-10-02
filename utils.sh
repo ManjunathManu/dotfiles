@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034  # palette variables are used by scripts that source this file
 
 set +e
 set -o noglob
@@ -8,6 +9,7 @@ set -o noglob
 #
 
 bold="\e[1m"
+# Color/style palette for scripts that source this file (some unused here)
 dim="\e[2m"
 underline="\e[4m"
 blink="\e[5m"
@@ -100,13 +102,14 @@ jsonValue() {
 
 vercomp() {
 	# Simplified version comparison compatible with bash and zsh
-	if [[ $1 == $2 ]]; then
+	if [[ $1 == "$2" ]]; then
 		return 0
 	fi
 
 	# Convert versions to comparable format
-	local v1=$(echo "$1" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }')
-	local v2=$(echo "$2" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }')
+	local v1 v2
+	v1=$(echo "$1" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }')
+	v2=$(echo "$2" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }')
 
 	if [[ $v1 -gt $v2 ]]; then
 		return 1

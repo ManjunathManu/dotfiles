@@ -1,3 +1,4 @@
+# shellcheck shell=bash disable=SC2034  # sourced template: variables are used by zsh_aliases
 # AWS / TEAM configuration
 #
 # Copy to config/aws.local.sh (gitignored) and fill in real values:
