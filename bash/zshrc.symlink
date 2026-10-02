@@ -185,24 +185,35 @@ else
     export PROMPT='${COLOR_USR}%n ${COLOR_DIR}$(prompt_short_dir)${COLOR_GIT} $(parse_git_branch)${COLOR_DEF}$ '
 fi
 
-# Tell kitty which `sso <name>` this window used (and when those credentials
-# expire) before each prompt, so the custom tab bar (kitty/tab_bar.py) can show
-# "dev · 52m" and turn red for prod. Uses kitty user vars:
-# OSC 1337 SetUserVar=<name>=<base64 value>; no value unsets it.
-if [[ "$TERM" == "xterm-kitty" ]]; then
-    _kitty_user_var() {
-        if [[ -n "$2" ]]; then
-            printf '\e]1337;SetUserVar=%s=%s\a' "$1" "$(printf %s "$2" | base64)"
+# AWS segment for the Starship prompt: the `sso <name>` account in this shell
+# and time left on its credentials, e.g. "dev · 52m" (with the md-aws icon). Starship can't compute
+# the countdown or style by account, so before each prompt this sets exactly
+# one of these, and starship.toml gives each its own look:
+#   STARSHIP_AWS          normal          STARSHIP_AWS_LOW      < 10 min left
+#   STARSHIP_AWS_EXPIRED  expired         STARSHIP_AWS_PROD / _MPROD  prod accounts
+# Pure zsh (zsh/datetime), no subprocesses.
+zmodload zsh/datetime
+_starship_aws() {
+    unset STARSHIP_AWS STARSHIP_AWS_LOW STARSHIP_AWS_EXPIRED STARSHIP_AWS_PROD STARSHIP_AWS_MPROD
+    [[ -z $AWS_SSO_NAME ]] && return
+    local text=$'\U000F0E0F'" $AWS_SSO_NAME" var=STARSHIP_AWS expires mins hm
+    if [[ -n $AWS_CREDENTIAL_EXPIRATION ]] &&
+       TZ=UTC strftime -r -s expires '%Y-%m-%dT%H:%M:%S' "${AWS_CREDENTIAL_EXPIRATION[1,19]}" 2>/dev/null; then
+        mins=$(( (expires - EPOCHSECONDS) / 60 ))
+        if (( mins < 0 )); then
+            text+=" · expired"; var=STARSHIP_AWS_EXPIRED
         else
-            printf '\e]1337;SetUserVar=%s\a' "$1"
+            if (( mins >= 60 )); then printf -v hm ' · %dh%02dm' $(( mins / 60 )) $(( mins % 60 )); text+=$hm; else text+=" · ${mins}m"; fi
+            (( mins < 10 )) && var=STARSHIP_AWS_LOW
         fi
-    }
-    _kitty_sync_user_vars() {
-        _kitty_user_var aws_sso "$AWS_SSO_NAME"
-        _kitty_user_var aws_expires "$AWS_CREDENTIAL_EXPIRATION"
-    }
-    precmd_functions+=(_kitty_sync_user_vars)
-fi
+    fi
+    case ${AWS_SSO_NAME:l} in
+        prod)   var=STARSHIP_AWS_PROD ;;
+        mprod)  var=STARSHIP_AWS_MPROD ;;
+    esac
+    export "$var=$text"
+}
+precmd_functions+=(_starship_aws)
 
 # if [ "$color_prompt" = yes ]; then
   # PROMPT='%F{green}%n@%m%f:%F{blue}%~%u$(parse_git_branch)%F{yellow}%f% $ '

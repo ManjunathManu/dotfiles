@@ -1,11 +1,9 @@
 # Custom kitty tab bar: powerline tabs on the left, tmux-style status on the right.
 # Linked to ~/.config/kitty/tab_bar.py; enabled by `tab_bar_style custom` in kitty.conf.
 #
-# Segments (right side): AWS · load · local IP · UTC timestamp
-#   AWS   name from `sso dev|prod|mprod` in the focused split + time left on
-#         those credentials (both sent as kitty user vars by a zsh precmd hook
-#         in zshrc). Hidden where `sso` wasn't run. Red background for prod.
+# Segments (right side): load · local IP · UTC timestamp
 #   load  1-minute load average, colored by load per CPU core.
+# (The AWS `sso` account + expiry is in the Starship prompt, starship.toml.)
 # Everything runs on kitty's timer (no threads) and makes no network calls.
 # A segment shows "–" when its lookup fails, instead of disappearing.
 # Errors here make kitty fall back to the default tab bar.
@@ -28,20 +26,15 @@ from kitty.utils import color_as_int
 
 # ── Settings ────────────────────────────────────────────────────────────────
 
-REFRESH_SECONDS = 1          # redraw interval (UTC seconds, load, AWS)
+REFRESH_SECONDS = 1          # redraw interval (UTC seconds, load)
 LOCAL_IP_SECONDS = 30        # local IP check interval
-CREDS_WARN_MINUTES = 10      # AWS credentials turn yellow below this
-PROD_PATTERN = re.compile(r"prod", re.IGNORECASE)   # matches prod, mprod
-# Segment background per prod account; other prod matches (mprod) use theme red
-PROD_BACKGROUNDS = {"prod": 0xF9E2AF}               # light yellow
 
 # Order of segments on the right; remove names to hide them
-SEGMENTS = ["aws", "load", "local_ip", "utc"]
+SEGMENTS = ["load", "local_ip", "utc"]
 # When the window is too narrow, hide segments in this order
-DROP_ORDER = ["local_ip", "load", "utc", "aws"]
+DROP_ORDER = ["local_ip", "load", "utc"]
 
 # Nerd Font icons (JetBrainsMono Nerd Font). Names from nerdfonts.com/cheat-sheet
-ICON_AWS = "\U000f0e0f"       # md-aws
 ICON_LOAD = "\U000f04c5"      # md-speedometer
 ICON_LAN = "\U000f0a5f"       # md-ip
 ICON_WORLD = "\U000f01e7"     # md-earth
@@ -93,73 +86,6 @@ _timer_id = None
 Segment = tuple[str, str, int, int | None]
 
 
-def _active_window(os_window_id: int):
-    boss = get_boss()
-    for tm in boss.all_tab_managers:
-        if tm.os_window_id == os_window_id:
-            return tm.active_window
-    return boss.active_window
-
-
-def _duration(td: datetime.timedelta) -> str:
-    mins = int(td.total_seconds() // 60)
-    return f"{mins // 60}h{mins % 60:02d}m" if mins >= 60 else f"{mins}m"
-
-
-def _luminance(rgb: int) -> float:
-    def ch(v: int) -> float:
-        v /= 255
-        return v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
-    return 0.2126 * ch(rgb >> 16 & 255) + 0.7152 * ch(rgb >> 8 & 255) + 0.0722 * ch(rgb & 255)
-
-
-def _readable_on(bg: int) -> int:
-    """Theme background or foreground, whichever contrasts more with `bg`."""
-    opts = get_options()
-    candidates = [color_as_int(opts.background), color_as_int(opts.foreground)]
-    lb = _luminance(bg)
-    return max(candidates, key=lambda c: (max(_luminance(c), lb) + 0.05) / (min(_luminance(c), lb) + 0.05))
-
-
-def _parse_time(value: str) -> datetime.datetime | None:
-    try:
-        t = datetime.datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-    return t if t.tzinfo else t.replace(tzinfo=datetime.timezone.utc)
-
-
-def _aws_segment(os_window_id: int, c, now) -> Segment | None:
-    """`sso <name>` used in the focused split, plus time left on its credentials.
-
-    Hidden in splits where `sso` hasn't been run. The credentials are static env
-    vars (no silent refresh), so "expired" means: run `sso <name>` again.
-    """
-    win = _active_window(os_window_id)
-    user_vars = (getattr(win, "user_vars", None) or {}) if win else {}
-    name = user_vars.get("aws_sso", "")
-    if not name:
-        return None
-
-    expires = _parse_time(user_vars.get("aws_expires", ""))
-    if expires is None:
-        left_text, fg = "", c(2)
-    elif expires <= now:
-        left_text, fg = "expired", c(1)
-    else:
-        left = expires - now
-        left_text = _duration(left)
-        fg = c(3) if left.total_seconds() < CREDS_WARN_MINUTES * 60 else c(2)
-
-    text = f"{ICON_AWS} {name}" + (f" · {left_text}" if left_text else "")
-    if PROD_PATTERN.search(name):
-        # Prod: solid background (light yellow for prod, red for mprod), impossible
-        # to miss; text is the theme's fg or bg, whichever reads better on it
-        bg = PROD_BACKGROUNDS.get(name.lower(), c(1))
-        return ("aws", text, _readable_on(bg), bg)
-    return ("aws", text, fg, None)
-
-
 def _load_segment(c) -> Segment:
     load = os.getloadavg()[0]
     per_core = load / (os.cpu_count() or 1)
@@ -167,12 +93,11 @@ def _load_segment(c) -> Segment:
     return ("load", f"{ICON_LOAD} {load:.2f}", fg, None)
 
 
-def _segments(os_window_id: int) -> list[Segment]:
+def _segments() -> list[Segment]:
     opts = get_options()
     c = lambda n: color_as_int(getattr(opts, f"color{n}"))  # noqa: E731
     now = datetime.datetime.now(datetime.timezone.utc)
     parts: dict[str, Segment | None] = {
-        "aws": _aws_segment(os_window_id, c, now),
         "load": _load_segment(c),
         "local_ip": ("local_ip", f"{ICON_LAN} {_state['local_ip'] or '–'}", c(4), None),
         "utc": ("utc", f"{ICON_WORLD} {now:%Y-%m-%d %H:%M:%S} UTC", c(6), None),
@@ -181,7 +106,7 @@ def _segments(os_window_id: int) -> list[Segment]:
 
 
 def _draw_right_status(draw_data: DrawData, screen: Screen) -> None:
-    segments = _segments(draw_data.os_window_id)
+    segments = _segments()
     bar_bg = as_rgb(color_as_int(draw_data.default_bg))
     seg_bg = color_as_int(draw_data.inactive_bg)
 

@@ -63,7 +63,7 @@ zsh -n file; bash -n file            # syntax only; also dry-run scripts, it mis
 - **Never cache `mise activate`**: its output embeds the current `$PATH`. brew's `shellenv` is safe to cache (uses `${PATH+:$PATH}`).
 - `bindkey -v` is set explicitly before any other `bindkey`; zsh only auto-picks vi mode if `$EDITOR` contains "vi" at that moment.
 - atuin is initialized last (after `~/.enhanced_zsh`, which loads fzf's Ctrl+R) with `--disable-up-arrow --disable-ai`.
-- A precmd hook sends kitty user vars (`aws_sso`, `aws_expires`) for the tab bar; `sso <name>` exports `AWS_SSO_NAME`.
+- `sso <name>` exports `AWS_SSO_NAME` (+ `AWS_CREDENTIAL_EXPIRATION`). The precmd hook `_starship_aws` turns them into exactly one `STARSHIP_AWS*` variable (normal / low / expired / prod / mprod), each styled by an `env_var` module in starship.toml. Starship's own `aws` module can't read that expiry or style per account.
 
 ### kitty
 
