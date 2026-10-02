@@ -1,135 +1,163 @@
-# Starship Prompt Configuration
-# https://starship.rs/config/
+# Starship prompt: https://starship.rs/config/
+# Linked to ~/.config/starship/starship.toml; STARSHIP_CONFIG in zshrc/bashrc
+# points Starship there (it would otherwise look for ~/.config/starship.toml).
+#
+# Design:
+#   - Colors are ANSI names, not hex, so they follow kitty's auto theme
+#     (Tokyo Night dark / Modus Operandi light).
+#   - Nothing the kitty tab bar already shows (AWS account, time).
+#   - Context only where it matters: language versions in projects that use
+#     them, kube context only in Kubernetes folders (red for prod contexts).
+#   - Icons are Nerd Font codepoints by name (nerdfonts.com/cheat-sheet).
+#
+#   ~/w/s/l/lm-commons  master [!2?1]  󰎙 22.22.0                 took 3s
+#   ❯                    (❮ in vi normal mode, red after a failed command)
 
-# Timeout for commands (in milliseconds)
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
 command_timeout = 500
 
-# Add a blank line between shell prompts
-add_newline = true
-
-# Format: customize what's shown in the prompt
 format = """
-[┌─](bold green)$username\
 $hostname\
 $directory\
 $git_branch\
+$git_state\
 $git_status\
-$python\
 $nodejs\
+$python\
 $rust\
 $golang\
-$docker_context\
-$aws\
-$kubernetes\
+$java\
 $terraform\
-$cmd_duration
-[└─](bold green)$character"""
+$docker_context\
+$kubernetes\
+$line_break\
+$jobs\
+$character"""
 
+right_format = "$cmd_duration"
+
+# ── Prompt character: vi mode + last exit status ─────────────────────────────
 [character]
 success_symbol = "[❯](bold green)"
 error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold green)"
+vimcmd_replace_one_symbol = "[❮](bold purple)"
+vimcmd_replace_symbol = "[❮](bold purple)"
+vimcmd_visual_symbol = "[❮](bold yellow)"
 
-[username]
-style_user = "bold green"
-style_root = "bold red"
-format = "[$user]($style) "
-disabled = false
-show_always = false
-
+# ── Where am I ───────────────────────────────────────────────────────────────
 [hostname]
 ssh_only = true
-format = "[@$hostname](bold blue) "
-disabled = false
+format = "[$hostname](bold yellow) "
+
+[username]
+# Only shown as root or over SSH (default); never for the normal local user
+format = "[$user]($style)@"
 
 [directory]
-truncation_length = 3
+truncation_length = 4
 truncate_to_repo = true
-format = "[$path]($style)[$read_only]($read_only_style) "
 style = "bold cyan"
-read_only = " 🔒"
+repo_root_style = "bold blue"
+read_only = " \U000F033E"
 read_only_style = "red"
 
-[directory.substitutions]
-"Documents" = "📄 "
-"Downloads" = "📥 "
-"Music" = "🎵 "
-"Pictures" = "📷 "
-"workspace" = "💼 "
-
+# ── Git ──────────────────────────────────────────────────────────────────────
 [git_branch]
-symbol = " "
-format = "on [$symbol$branch]($style) "
+symbol = " "
+format = "[$symbol$branch(:$remote_branch)]($style) "
 style = "bold purple"
+
+[git_state]
+# Shown mid-rebase/merge/cherry-pick, e.g. "REBASING 2/5"
+style = "bold yellow"
 
 [git_status]
 format = '([\[$all_status$ahead_behind\]]($style) )'
 style = "bold red"
-conflicted = "🏳"
+conflicted = "="
 ahead = "⇡${count}"
 behind = "⇣${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+diverged = "⇡${ahead_count}⇣${behind_count}"
 untracked = "?${count}"
-stashed = "$${count}"
+stashed = "*${count}"
 modified = "!${count}"
 staged = "+${count}"
 renamed = "»${count}"
 deleted = "✘${count}"
 
-[python]
-symbol = " "
-format = 'via [${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
-style = "yellow bold"
-pyenv_version_name = false
-detect_extensions = ["py"]
-detect_files = [".python-version", "Pipfile", "__pycache__", "pyproject.toml", "requirements.txt", "setup.py", "tox.ini"]
-detect_folders = []
-
+# ── Languages: only inside projects that use them ────────────────────────────
 [nodejs]
-symbol = " "
-format = "via [$symbol($version )]($style)"
+symbol = "\U000F0399 "
+format = "[$symbol($version )]($style)"
+version_format = "${raw}"
 style = "bold green"
-detect_extensions = ["js", "mjs", "cjs", "ts"]
-detect_files = ["package.json", ".node-version"]
+detect_files = ["package.json", ".nvmrc", ".node-version"]
+detect_extensions = []
+
+[python]
+symbol = " "
+format = '[$symbol$version( \($virtualenv\))]($style) '
+version_format = "${raw}"
+style = "bold yellow"
+detect_files = [".python-version", "pyproject.toml", "requirements.txt", "setup.py", "Pipfile", "uv.lock"]
+detect_extensions = []
 
 [rust]
-symbol = " "
-format = "via [$symbol($version )]($style)"
-style = "bold red"
+symbol = " "
+format = "[$symbol($version )]($style)"
 
 [golang]
-symbol = " "
-format = "via [$symbol($version )]($style)"
-style = "bold cyan"
+symbol = "\U000F07D3 "
+format = "[$symbol($version )]($style)"
 
-[docker_context]
-symbol = " "
-format = "via [$symbol$context]($style) "
-style = "blue bold"
-only_with_files = true
-
-[aws]
-symbol = "☁️  "
-format = 'on [$symbol($profile )(\($region\) )]($style)'
-style = "bold yellow"
-disabled = false
-
-[kubernetes]
-symbol = "☸ "
-format = 'on [$symbol$context( \($namespace\))]($style) '
-style = "cyan bold"
-disabled = false
+[java]
+symbol = "\U000F0B37 "
+format = "[$symbol($version )]($style)"
 
 [terraform]
-symbol = "💠 "
-format = "via [$symbol$workspace]($style) "
-style = "bold purple"
+symbol = "\U000F1062 "
+format = "[$symbol$workspace]($style) "
 
+# ── Containers / clusters: only in folders that use them ─────────────────────
+[docker_context]
+symbol = " "
+format = "[$symbol$context]($style) "
+only_with_files = true
+
+[kubernetes]
+disabled = false
+symbol = "\U000F10FE "
+format = '[$symbol$context( \($namespace\))]($style) '
+style = "bold blue"
+detect_files = ["Chart.yaml", "kustomization.yaml", "skaffold.yaml", "helmfile.yaml"]
+detect_folders = ["k8s", "kubernetes", "helm", "charts", "manifests"]
+
+[[kubernetes.contexts]]
+# Any context with "prod" in its name: red, so it's hard to miss
+context_pattern = ".*prod.*"
+style = "bold red"
+
+# ── Feedback ─────────────────────────────────────────────────────────────────
 [cmd_duration]
-min_time = 500
-format = "took [$duration]($style) "
-style = "bold yellow"
+min_time = 2_000
+format = "[took $duration]($style)"
+style = "yellow"
+# kitty already notifies for long commands in unfocused windows
+show_notifications = false
 
-[time]
+[jobs]
+symbol = "✦"
+style = "bold blue"
+
+# ── Off on purpose ───────────────────────────────────────────────────────────
+[aws]
+disabled = true      # the kitty tab bar shows the `sso` account + expiry
+[gcloud]
 disabled = true
-format = '🕙[\[ $time \]]($style) '
-time_format = "%T"
+[package]
+disabled = true      # package.json version is rarely useful in a prompt
+[time]
+disabled = true      # the kitty tab bar shows UTC; macOS shows local time

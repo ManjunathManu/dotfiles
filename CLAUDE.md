@@ -85,6 +85,7 @@ zsh -n file; bash -n file            # syntax only; also dry-run scripts, it mis
 - `mise/lightmetrics.mise.toml` is linked to `~/workspace/source-code/lightmetrics/mise.toml` (mise reads parent folders, so it covers every work repo). Its enter hook prints an `sso` reminder via `_aws_sso_hint`; it never logs in by itself.
 - `mise-env` (zsh) loads a repo's `.env` via an untracked `mise.local.toml` (listed in `.git/info/exclude`); `mise-env off` removes it.
 - `grep` is aliased to `rg` in zsh: use `command grep` in shell functions.
+- Starship's config is at `~/.config/starship/starship.toml` (link.sh puts it there), so `STARSHIP_CONFIG` must be exported before `starship init` in zshrc/bashrc; without it Starship silently uses its defaults. Prompt colors are ANSI names so they follow kitty's dark/light theme.
 
 ### Upkeep
 

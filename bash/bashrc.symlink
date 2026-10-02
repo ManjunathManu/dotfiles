@@ -66,6 +66,8 @@ function parse_git_branch() {
 }
 
 # Initialize Starship prompt if available, otherwise use traditional prompt
+# Config lives in ~/.config/starship/ (link.sh), not Starship's default ~/.config/starship.toml
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
 if command -v starship &> /dev/null; then
     eval "$(starship init bash)"
 else
