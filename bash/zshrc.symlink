@@ -185,27 +185,25 @@ else
     export PROMPT='${COLOR_USR}%n ${COLOR_DIR}$(prompt_short_dir)${COLOR_GIT} $(parse_git_branch)${COLOR_DEF}$ '
 fi
 
-# AWS segment for the Starship prompt: the `sso <name>` account in this shell
-# and time left on its credentials, e.g. "dev · 52m" (with the md-aws icon). Starship can't compute
-# the countdown or style by account, so before each prompt this sets exactly
-# one of these, and starship.toml gives each its own look:
-#   STARSHIP_AWS          normal          STARSHIP_AWS_LOW      < 10 min left
-#   STARSHIP_AWS_EXPIRED  expired         STARSHIP_AWS_PROD / _MPROD  prod accounts
+# AWS segment for the Starship prompt: the `sso <name>` account in this shell,
+# plus " · expired" once its credentials have expired (no countdown).
+# Starship can't style by account or read that expiry, so before each prompt
+# this sets exactly one of these, and starship.toml colors each:
+#   STARSHIP_AWS          active (green)
+#   STARSHIP_AWS_PROD     prod, active (yellow)
+#   STARSHIP_AWS_MPROD    mprod, active (red)
+#   STARSHIP_AWS_EXPIRED  any account, expired (red)
 # Pure zsh (zsh/datetime), no subprocesses.
 zmodload zsh/datetime
 _starship_aws() {
-    unset STARSHIP_AWS STARSHIP_AWS_LOW STARSHIP_AWS_EXPIRED STARSHIP_AWS_PROD STARSHIP_AWS_MPROD
+    unset STARSHIP_AWS STARSHIP_AWS_EXPIRED STARSHIP_AWS_PROD STARSHIP_AWS_MPROD
     [[ -z $AWS_SSO_NAME ]] && return
-    local text=$'\U000F0E0F'" $AWS_SSO_NAME" var=STARSHIP_AWS expires mins hm
+    local text=$'\U000F0E0F'" $AWS_SSO_NAME" var=STARSHIP_AWS expires
     if [[ -n $AWS_CREDENTIAL_EXPIRATION ]] &&
-       TZ=UTC strftime -r -s expires '%Y-%m-%dT%H:%M:%S' "${AWS_CREDENTIAL_EXPIRATION[1,19]}" 2>/dev/null; then
-        mins=$(( (expires - EPOCHSECONDS) / 60 ))
-        if (( mins < 0 )); then
-            text+=" · expired"; var=STARSHIP_AWS_EXPIRED
-        else
-            if (( mins >= 60 )); then printf -v hm ' · %dh%02dm' $(( mins / 60 )) $(( mins % 60 )); text+=$hm; else text+=" · ${mins}m"; fi
-            (( mins < 10 )) && var=STARSHIP_AWS_LOW
-        fi
+       TZ=UTC strftime -r -s expires '%Y-%m-%dT%H:%M:%S' "${AWS_CREDENTIAL_EXPIRATION[1,19]}" 2>/dev/null &&
+       (( expires <= EPOCHSECONDS )); then
+        export STARSHIP_AWS_EXPIRED="$text · expired"   # any account: red
+        return
     fi
     case ${AWS_SSO_NAME:l} in
         prod)   var=STARSHIP_AWS_PROD ;;

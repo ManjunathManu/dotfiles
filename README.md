@@ -20,7 +20,7 @@ cd ~/workspace/source-code/personal/dotfiles
 | Area | Highlights |
 |---|---|
 | **kitty** ([`kitty/`](kitty)) | Splits and tabs without a tmux prefix; custom tab bar with load, local IP and UTC time; auto dark/light themes (Tokyo Night / Modus Operandi); project sessions; scrollback in Neovim |
-| **zsh** ([`bash/`](bash)) | ~0.27s startup (cached tool init); vi mode; [Starship](https://starship.rs) prompt with the `sso` AWS account + credential countdown (prod highlighted); [atuin](https://atuin.sh) history search on `Ctrl+R` (local only); fzf |
+| **zsh** ([`bash/`](bash)) | ~0.27s startup (cached tool init); vi mode; [Starship](https://starship.rs) prompt with the `sso` AWS account (prod in yellow, mprod in red, "expired" when the session ends); [atuin](https://atuin.sh) history search on `Ctrl+R` (local only); fzf |
 | **Node / Python** ([`mise/`](mise)) | mise instead of nvm + pyenv; switches versions from `.nvmrc` / `.python-version`; `mise-env` loads a repo's `.env` on demand |
 | **git** ([`git/`](git)) | Rebase on pull, rerere, auto upstream on push, zdiff3 conflicts; [delta](https://github.com/dandavison/delta) diffs; per-folder email for personal vs work repos |
 | **Safety** | Global [gitleaks](https://github.com/gitleaks/gitleaks) hook blocks secrets in every repo; this repo also runs shellcheck via [pre-commit](.pre-commit-config.yaml) |

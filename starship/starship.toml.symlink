@@ -5,12 +5,12 @@
 # Design:
 #   - Colors are ANSI names, not hex, so they follow kitty's auto theme
 #     (Tokyo Night dark / Modus Operandi light).
-#   - AWS `sso` account + credential expiry here; time stays in the kitty tab bar.
+#   - AWS `sso` account here (+ "expired"); time stays in the kitty tab bar.
 #   - Context only where it matters: language versions in projects that use
 #     them, kube context only in Kubernetes folders (red for prod contexts).
 #   - Icons are Nerd Font codepoints by name (nerdfonts.com/cheat-sheet).
 #
-#   lm-commons  master [!2?1] 󰎙 22.22.0 󰸏 dev · 52m            took 3s
+#   lm-commons  master [!2?1] 󰎙 22.22.0 󰸏 dev                   took 3s
 #   ❯                    (❮ in vi normal mode, red after a failed command)
 
 "$schema" = 'https://starship.rs/config-schema.json'
@@ -33,7 +33,6 @@ $terraform\
 $docker_context\
 $kubernetes\
 ${env_var.STARSHIP_AWS}\
-${env_var.STARSHIP_AWS_LOW}\
 ${env_var.STARSHIP_AWS_EXPIRED}\
 ${env_var.STARSHIP_AWS_PROD}\
 ${env_var.STARSHIP_AWS_MPROD}\
@@ -145,7 +144,7 @@ detect_folders = ["k8s", "kubernetes", "helm", "charts", "manifests"]
 context_pattern = ".*prod.*"
 style = "bold red"
 
-# ── AWS `sso` account + credential expiry ────────────────────────────────────
+# ── AWS `sso` account (active / expired) ─────────────────────────────────────
 # Text is prepared before each prompt by _starship_aws (bash/zshrc.symlink),
 # which sets exactly one of these variables depending on the state.
 [env_var.STARSHIP_AWS]
@@ -153,25 +152,20 @@ variable = "STARSHIP_AWS"
 format = "[$env_value]($style) "
 style = "bold green"
 
-[env_var.STARSHIP_AWS_LOW]
-variable = "STARSHIP_AWS_LOW"         # under 10 minutes left
-format = "[$env_value]($style) "
-style = "bold yellow"
-
 [env_var.STARSHIP_AWS_EXPIRED]
 variable = "STARSHIP_AWS_EXPIRED"     # run `sso <name>` again
 format = "[$env_value]($style) "
 style = "bold red"
 
 [env_var.STARSHIP_AWS_PROD]
-variable = "STARSHIP_AWS_PROD"        # prod: light yellow background
-format = "[ $env_value ]($style) "
-style = "bold fg:#000000 bg:#f9e2af"
+variable = "STARSHIP_AWS_PROD"        # prod
+format = "[$env_value]($style) "
+style = "bold yellow"
 
 [env_var.STARSHIP_AWS_MPROD]
-variable = "STARSHIP_AWS_MPROD"       # master-prod: red background
-format = "[ $env_value ]($style) "
-style = "bold fg:#ffffff bg:#a60000"
+variable = "STARSHIP_AWS_MPROD"       # master-prod
+format = "[$env_value]($style) "
+style = "bold red"
 
 # ── Feedback ─────────────────────────────────────────────────────────────────
 [cmd_duration]
