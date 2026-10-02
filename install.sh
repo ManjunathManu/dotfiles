@@ -22,7 +22,7 @@ newLine
 
 h2 "Your development stack"
 newLine
-success "nvm: $(nvm --version)"
+success "mise: $(mise --version 2>&1 | head -1)"
 success "node: $(node -v)"
 success "npm: $(npm -v)"
 success "python: $(python3 --version 2>&1)"

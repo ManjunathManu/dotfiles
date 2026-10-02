@@ -4,7 +4,7 @@
 #   brew bundle check --file=...                                            # anything missing?
 #   brew bundle cleanup --file=...                                          # list extras not in here
 #
-# Run by install/stack.sh after nvm + Node, so the npm entries below can install.
+# Run by install/stack.sh after mise installs Node, so the npm entries below can install.
 # Generated from `brew bundle dump` (2026-10-02), then grouped and reviewed.
 # Keep it current: add new tools here instead of a bare `brew install`.
 
@@ -58,8 +58,9 @@ brew "lua-language-server"
 brew "stylua"
 
 # ── Languages & version managers ─────────────────────────────────────────────
-# Node comes from nvm (installed by install/stack.sh), not Homebrew.
-brew "pyenv"
+# Node + Python versions come from mise (mise/config.toml.symlink), not Homebrew.
+brew "mise"
+brew "pyenv"              # ⚠ replaced by mise; keep until ~/.pyenv versions are no longer needed
 brew "python@3.9", link: false
 brew "pipx"
 brew "uv"
@@ -98,7 +99,7 @@ cask "hammerspoon"
 cask "macgesture"
 cask "warp"               # ⚠ another terminal; remove if kitty has replaced it
 
-# ── Global npm packages (need Node from nvm) ─────────────────────────────────
+# ── Global npm packages (need Node from mise) ────────────────────────────────
 npm "@angular/cli"
 npm "corepack"
 npm "prettier"

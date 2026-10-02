@@ -12,11 +12,8 @@ export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/b
 # export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-# One cached `pyenv init -` (it already sets up PATH, so `init --path` was a
-# duplicate). --no-rehash: shims are rebuilt by `pyenv install` / pip, not per shell.
-_cached_source pyenv-init pyenv pyenv init - --no-rehash zsh || eval "$(pyenv init - zsh)"
+# Node and Python versions come from mise (activated in zshrc), which replaced
+# nvm + pyenv. Existing versions in ~/.nvm and ~/.pyenv are reused by mise.
 
 # Load machine-local secrets (not tracked in git)
 [ -f ~/.secrets ] && . ~/.secrets

@@ -301,35 +301,24 @@ source ~/workspace/source-code/personal/dotfiles/utils.sh
 
 # export PATH="/usr/node-v18.15.0/bin:$PATH"
 
-# nvm, lazy-loaded (sourcing nvm.sh took ~1.1s per shell).
-# The default Node's bin dir goes straight on PATH, so node/npm/npx and global
-# tools work immediately; nvm itself loads on the first `nvm ...` call.
-# The bin dir is cached in ~/.cache/zsh/nvm-default-bin and recomputed when
-# the default alias changes or that version is removed.
-export NVM_DIR="$HOME/.nvm"
-if [[ -s "$NVM_DIR/nvm.sh" ]]; then
-    () {
-        local cache="$_ZSH_CACHE_DIR/nvm-default-bin" bin=""
-        [[ -r $cache && ! $NVM_DIR/alias/default -nt $cache ]] && bin=$(<$cache)
-        if [[ ! -x $bin/node ]]; then
-            # `nvm version` works on old and new nvm (`nvm which` doesn't exist
-            # on old ones); then look in each install layout nvm has used.
-            local v=$(source "$NVM_DIR/nvm.sh" --no-use && nvm version default 2>/dev/null) d
-            bin=""
-            for d in "$NVM_DIR/versions/node/$v" "$NVM_DIR/versions/$v" "$NVM_DIR/$v"; do
-                [[ -n $v && -x $d/bin/node ]] && { bin=$d/bin; break; }
-            done
-            [[ -n $bin ]] && { mkdir -p ${cache:h}; print -r -- $bin >| $cache; }
-        fi
-        [[ -x $bin/node ]] && export PATH="$bin:$PATH" NVM_BIN="$bin"
-    }
-    nvm() {
-        unfunction nvm
-        source "$NVM_DIR/nvm.sh" --no-use
-        [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
-        nvm "$@"
-    }
+# mise: Node + Python versions (replaced nvm + pyenv). Global defaults live in
+# mise/config.toml.symlink; projects switch automatically on `cd` via mise.toml,
+# .nvmrc or .python-version.
+# Not cached (~26ms live): `mise activate` embeds the current $PATH in its
+# output, so a cached copy would freeze an old PATH into every new shell.
+if (( $+commands[mise] )); then
+    eval "$(mise activate zsh)"
 fi
+
+# Point old habits at the new tool
+nvm() {
+    print -u2 "nvm was replaced by mise. Equivalents:"
+    print -u2 "  nvm use 20        → mise use node@20      (this project: writes mise.toml)"
+    print -u2 "  nvm install 20    → mise install node@20"
+    print -u2 "  nvm ls            → mise ls node"
+    print -u2 "  nvm alias default → edit ~/.config/mise/config.toml (or: mise use -g node@20)"
+    return 1
+}
 
 
 # Load Angular CLI autocompletion (cached; regenerated when ng is upgraded).

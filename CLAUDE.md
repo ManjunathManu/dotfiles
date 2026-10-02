@@ -22,7 +22,7 @@ The core architecture uses symbolic links to manage dotfiles:
 
 The installation process is orchestrated through `install.sh`, which sources three modular scripts:
 
-1. **install/stack.sh** - Installs Homebrew, nvm + Node, then everything in `Brewfile` (`brew bundle`). New tools go in the Brewfile, not as separate install steps
+1. **install/stack.sh** - Installs Homebrew, mise + Node/Python (`mise/config.toml.symlink`), then everything in `Brewfile` (`brew bundle`). New tools go in the Brewfile, not as separate install steps
 2. **install/link.sh** - Creates symlinks for all `.symlink` files
 3. **install/git.sh** - Interactive git global configuration
 

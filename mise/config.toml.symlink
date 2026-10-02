@@ -1,0 +1,16 @@
+# mise: global tool versions (replaces nvm + pyenv).
+# Linked to ~/.config/mise/config.toml by install/link.sh.
+#
+# Per project: `mise use node@20` writes a mise.toml in that directory, or
+# keep using .nvmrc / .python-version files (enabled below).
+# Docs: https://mise.jdx.dev
+
+[tools]
+# Same versions nvm/pyenv used as defaults. Existing installs are reused via
+# symlinks in ~/.local/share/mise/installs (see `mise sync node --nvm`).
+node = "22.22.0"
+python = "3.13.3"
+
+[settings]
+# Read the version files projects already have
+idiomatic_version_file_enable_tools = ["node", "python"]

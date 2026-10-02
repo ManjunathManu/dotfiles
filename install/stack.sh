@@ -1,13 +1,13 @@
 #!/bin/bash
 # Installs the development stack:
 #   1. Homebrew
-#   2. nvm + a default Node (needed before the Brewfile's npm entries)
+#   2. mise + the Node/Python versions in mise/config.toml.symlink (Node is
+#      needed before the Brewfile's npm entries)
 #   3. Everything in ../Brewfile: CLI tools, apps, fonts, npm globals, VS Code
 #      extensions. Add new tools to the Brewfile, not here.
 # Sourced by install.sh from the repo root.
 
 DOTFILES_DIR="${DOTFILES_DIR:-$(pwd)}"
-NVM_VERSION="v0.40.8"   # https://github.com/nvm-sh/nvm/releases
 
 h2 "Homebrew"
 if ! typeExists brew; then
@@ -19,21 +19,17 @@ fi
 eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || brew shellenv)"
 success "$(brew --version | head -1)"
 
-h2 "nvm + Node"
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-if [ ! -s "$NVM_DIR/nvm.sh" ]; then
-  # PROFILE=/dev/null: zshrc already sets nvm up (lazy-loaded), so the
-  # installer must not append its own lines to shell rc files
-  runCommand "curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VERSION/install.sh | PROFILE=/dev/null bash" \
-    "Failed to install nvm" "nvm $NVM_VERSION installed"
+h2 "mise + Node/Python"
+# mise replaced nvm + pyenv. The config is linked into ~/.config later
+# (install/link.sh), so point mise at the repo copy for this first install.
+export MISE_GLOBAL_CONFIG_FILE="$DOTFILES_DIR/mise/config.toml.symlink"
+if ! typeExists mise; then
+  runCommand "brew install mise" "Failed to install mise" "mise installed"
 fi
-source "$NVM_DIR/nvm.sh"
-if ! nvm version default >/dev/null 2>&1 || [ "$(nvm version default)" = "N/A" ]; then
-  runCommand "source \"$NVM_DIR/nvm.sh\" && nvm install --lts && nvm alias default 'lts/*'" \
-    "Failed to install Node" "Node LTS installed as nvm default"
-fi
-nvm use default >/dev/null 2>&1
-success "node $(node -v), npm $(npm -v)"
+runCommand "mise install" "Failed to install Node/Python with mise" "Node + Python installed"
+# Put those versions on PATH for the rest of this script (brew bundle's npm entries)
+export PATH="$(mise bin-paths | tr '\n' ':')$PATH"
+success "node $(node -v), npm $(npm -v), $(python3 --version)"
 
 h2 "Brewfile packages"
 # Third-party taps (go-swagger, localazy, pinecone) must be trusted before
