@@ -1,0 +1,11 @@
+# Shared mise config for every work repo.
+# Linked to ~/workspace/source-code/lightmetrics/mise.toml by install/link.sh;
+# mise reads config from parent folders, so this applies to all repos below it.
+# Trusted once by link.sh (`mise trust`), since it runs a hook.
+
+# On cd into any work repo: if this shell has no valid `sso` credentials,
+# print a one-line hint. Never logs in by itself. (_aws_sso_hint is defined
+# in bash/zsh_aliases.symlink; runs in the current shell so it can see them.)
+[hooks.enter]
+shell = "zsh"
+script = "(( $+functions[_aws_sso_hint] )) && _aws_sso_hint dev"

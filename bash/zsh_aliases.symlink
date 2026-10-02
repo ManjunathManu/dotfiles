@@ -288,6 +288,54 @@ sso() {
   echo "✅ AWS credentials exported for profile: $profile"
 }
 
+# Hint (never logs in by itself) when this shell has no valid `sso` credentials.
+# Called by the enter hook in mise/lightmetrics.mise.toml when you cd into a
+# work repo. Usage: _aws_sso_hint [suggested-profile]
+_aws_sso_hint() {
+  local want=${1:-dev} expires now
+  if [[ -z $AWS_SSO_NAME ]]; then
+    print -P "%F{yellow}AWS:%f no sso credentials in this shell. Run: %Bsso $want%b (or prod / mprod)"
+    return
+  fi
+  [[ -z $AWS_CREDENTIAL_EXPIRATION ]] && return
+  zmodload zsh/datetime
+  # AWS_CREDENTIAL_EXPIRATION is UTC ISO-8601, e.g. 2026-10-02T10:21:03+00:00
+  TZ=UTC strftime -r -s expires '%Y-%m-%dT%H:%M:%S' "${AWS_CREDENTIAL_EXPIRATION[1,19]}" 2>/dev/null || return
+  now=$EPOCHSECONDS
+  if (( expires <= now )); then
+    local mins=$(( (now - expires) / 60 )) ago
+    if (( mins < 120 )); then ago="${mins}m"; elif (( mins < 2880 )); then ago="$(( mins / 60 ))h"; else ago="$(( mins / 1440 ))d"; fi
+    print -P "%F{red}AWS:%f sso $AWS_SSO_NAME credentials expired $ago ago. Run: %Bsso $AWS_SSO_NAME%b"
+  fi
+}
+
+# Load the current repo's .env into this shell while you're inside it (mise
+# unsets it again when you leave). Writes mise.local.toml, which mise reads
+# but which never gets committed (added to .git/info/exclude, not .gitignore).
+#   mise-env          enable for this repo
+#   mise-env off      disable
+mise-env() {
+  local root
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "mise-env: not inside a git repo"; return 1; }
+  local cfg="$root/mise.local.toml" exclude="$(git -C "$root" rev-parse --git-common-dir)/info/exclude"
+  if [[ $1 == off ]]; then
+    [[ -f $cfg ]] && rm "$cfg" && echo "mise-env: removed ${cfg/#$HOME/~}" || echo "mise-env: not enabled here"
+    eval "$(mise hook-env -s zsh)"
+    return
+  fi
+  [[ -f "$root/.env" ]] || { echo "mise-env: no .env in ${root/#$HOME/~}"; return 1; }
+  if [[ -f $cfg ]]; then
+    echo "mise-env: ${cfg/#$HOME/~} already exists, leaving it as is"
+  else
+    printf '# Created by `mise-env` (dotfiles). Loads .env while inside this repo.\n[env]\n_.file = { path = ".env", redact = true }\n' > "$cfg"
+  fi
+  mkdir -p "${exclude:h}"
+  # `command grep`: plain grep may be aliased (e.g. to ripgrep)
+  command grep -qxF 'mise.local.toml' "$exclude" 2>/dev/null || echo 'mise.local.toml' >> "$exclude"
+  mise trust --quiet "$cfg" && eval "$(mise hook-env -s zsh)"
+  echo "mise-env: .env loaded for ${root:t} ($(command grep -cE '^(export )?[A-Za-z_][A-Za-z0-9_]*=' "$root/.env") variables; values not shown)"
+}
+
 # ********************** AWS TEAM Elevated Access ****************************
 
 team-request() {

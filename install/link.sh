@@ -41,3 +41,13 @@ find -H "$DOTFILES" -maxdepth 3 -name '*.symlink' | while IFS= read -r file; do
     ln -s "$file" "$target"
   fi
 done
+
+# Shared mise config for all work repos (mise also reads parent folders)
+WORK_DIR="$HOME/workspace/source-code/lightmetrics"
+if [ -d "$WORK_DIR" ]; then
+  if [ ! -e "$WORK_DIR/mise.toml" ]; then
+    ln -s "$DOTFILES/mise/lightmetrics.mise.toml" "$WORK_DIR/mise.toml" && info "Linked $WORK_DIR/mise.toml"
+  fi
+  # It defines a hook, so mise only runs it once trusted
+  command -v mise >/dev/null 2>&1 && mise trust --quiet "$WORK_DIR/mise.toml"
+fi

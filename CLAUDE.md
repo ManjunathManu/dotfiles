@@ -82,6 +82,9 @@ zsh -n file; bash -n file            # syntax only; also dry-run scripts, it mis
 
 - mise only (nvm and pyenv are gone). Defaults in `mise/config.toml.symlink`; projects switch via `mise.toml`, `.nvmrc` or `.python-version`.
 - Homebrew's `python@3.14` can't load `pyexpat` on macOS 26.0, so pre-commit is installed with `uv tool` on mise's Python.
+- `mise/lightmetrics.mise.toml` is linked to `~/workspace/source-code/lightmetrics/mise.toml` (mise reads parent folders, so it covers every work repo). Its enter hook prints an `sso` reminder via `_aws_sso_hint`; it never logs in by itself.
+- `mise-env` (zsh) loads a repo's `.env` via an untracked `mise.local.toml` (listed in `.git/info/exclude`); `mise-env off` removes it.
+- `grep` is aliased to `rg` in zsh: use `command grep` in shell functions.
 
 ## Working with This Repository
 
