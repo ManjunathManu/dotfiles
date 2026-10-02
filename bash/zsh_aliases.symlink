@@ -135,6 +135,17 @@ alias tks='tmux kill-session'
 # List all tmux sessions
 alias tls='tmux list-sessions'
 
+# *****************KITTY*******************
+
+# SSH that copies kitty's terminfo + shell integration to the remote host
+alias s='kitten ssh'
+
+# Show images in the terminal
+alias icat='kitten icat'
+
+# Side-by-side diff with syntax highlighting
+alias kdiff='kitten diff'
+
 # ****************GIT*************************
 
 alias gs='git status'
@@ -211,7 +222,7 @@ alias rzsh='source ~/.zshrc'
 
 # Account-specific values (profiles, TEAM settings) live in the gitignored
 # config/aws.local.sh; see config/aws.example.sh for the template.
-DOTFILES_DIR="$(dirname "$(dirname "$(readlink ~/.zsh_aliases)")")"
+DOTFILES_DIR="${${:-$HOME/.zsh_aliases}:A:h:h}"   # resolve symlink → repo root, no subshells
 [ -f "$DOTFILES_DIR/config/aws.local.sh" ] && . "$DOTFILES_DIR/config/aws.local.sh"
 
 # ********************** export profile_name ****************************
@@ -305,6 +316,9 @@ sso() {
   # local res="$(aws configure export-credentials --profile "$profile" --format env)"
   # echo res
   eval "$(aws configure export-credentials --profile "$profile" --format env)"
+  # Short name (dev/prod/mprod) for the kitty tab bar; expiry comes from
+  # AWS_CREDENTIAL_EXPIRATION, which export-credentials sets above
+  export AWS_SSO_NAME="$profile"
   echo "✅ AWS credentials exported for profile: $profile"
 }
 

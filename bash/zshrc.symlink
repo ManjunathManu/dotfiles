@@ -48,10 +48,32 @@ fi
 # Add zsh-completions to fpath
 fpath=($ZSH_PLUGIN_DIR/zsh-completions/src $fpath)
 
+# Cached `eval "$(tool init)"` helper (see bash/zsh_cache.zsh)
+source "${${(%):-%x}:A:h}/zsh_cache.zsh"
+
 # Initialize completion system BEFORE loading plugins
 # -i: silently ignore insecure directories (common on macOS with homebrew)
-autoload -Uz compinit && compinit -i
+# Full check + dump rebuild at most once a day; otherwise -C reuses the dump
+# (~470ms → ~30ms). New completions show up within 24h, or run: rm ~/.zcompdump
+autoload -Uz compinit
+() {
+    setopt local_options extended_glob
+    local dump=${ZDOTDIR:-$HOME}/.zcompdump
+    if [[ -f $dump && -z $dump(#qN.mh+24) ]]; then
+        compinit -C -i -d "$dump"
+    else
+        compinit -i -d "$dump"
+    fi
+}
 autoload -U +X bashcompinit && bashcompinit
+
+# Vi mode, set explicitly. zsh only auto-picks vi mode if $EDITOR/$VISUAL
+# contains "vi" when the first `bindkey` runs. EDITOR is exported further
+# down, so this only worked when the parent (e.g. tmux) already had EDITOR=vim.
+# Must stay before the plugins and any other bindkey below.
+bindkey -v
+# Esc → normal mode after 10ms instead of 400ms
+KEYTIMEOUT=1
 
 # Load plugins in correct order:
 # fzf-tab must be after compinit but before autosuggestions and syntax highlighting
@@ -161,6 +183,25 @@ else
     export PROMPT='${COLOR_USR}%n ${COLOR_DIR}$(prompt_short_dir)${COLOR_GIT} $(parse_git_branch)${COLOR_DEF}$ '
 fi
 
+# Tell kitty which `sso <name>` this window used (and when those credentials
+# expire) before each prompt, so the custom tab bar (kitty/tab_bar.py) can show
+# "dev · 52m" and turn red for prod. Uses kitty user vars:
+# OSC 1337 SetUserVar=<name>=<base64 value>; no value unsets it.
+if [[ "$TERM" == "xterm-kitty" ]]; then
+    _kitty_user_var() {
+        if [[ -n "$2" ]]; then
+            printf '\e]1337;SetUserVar=%s=%s\a' "$1" "$(printf %s "$2" | base64)"
+        else
+            printf '\e]1337;SetUserVar=%s\a' "$1"
+        fi
+    }
+    _kitty_sync_user_vars() {
+        _kitty_user_var aws_sso "$AWS_SSO_NAME"
+        _kitty_user_var aws_expires "$AWS_CREDENTIAL_EXPIRATION"
+    }
+    precmd_functions+=(_kitty_sync_user_vars)
+fi
+
 # if [ "$color_prompt" = yes ]; then
   # PROMPT='%F{green}%n@%m%f:%F{blue}%~%u$(parse_git_branch)%F{yellow}%f% $ '
 # else
@@ -187,6 +228,12 @@ fi
 # Use Vim as default editor
 export VISUAL=vim
 export EDITOR="$VISUAL"
+
+# git diff (delta) colors follow macOS appearance, like kitty's auto themes.
+# Checked at shell start (~17ms); "+" adds to the features set in gitconfig.
+if [[ "$OSTYPE" == darwin* && "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" != "Dark" ]]; then
+    export DELTA_FEATURES="+modus-operandi"
+fi
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -254,14 +301,40 @@ source ~/workspace/source-code/personal/dotfiles/utils.sh
 
 # export PATH="/usr/node-v18.15.0/bin:$PATH"
 
+# nvm, lazy-loaded (sourcing nvm.sh took ~1.1s per shell).
+# The default Node's bin dir goes straight on PATH, so node/npm/npx and global
+# tools work immediately; nvm itself loads on the first `nvm ...` call.
+# The bin dir is cached in ~/.cache/zsh/nvm-default-bin and recomputed when
+# the default alias changes or that version is removed.
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+    () {
+        local cache="$_ZSH_CACHE_DIR/nvm-default-bin" bin=""
+        [[ -r $cache && ! $NVM_DIR/alias/default -nt $cache ]] && bin=$(<$cache)
+        if [[ ! -x $bin/node ]]; then
+            # `nvm version` works on old and new nvm (`nvm which` doesn't exist
+            # on old ones); then look in each install layout nvm has used.
+            local v=$(source "$NVM_DIR/nvm.sh" --no-use && nvm version default 2>/dev/null) d
+            bin=""
+            for d in "$NVM_DIR/versions/node/$v" "$NVM_DIR/versions/$v" "$NVM_DIR/$v"; do
+                [[ -n $v && -x $d/bin/node ]] && { bin=$d/bin; break; }
+            done
+            [[ -n $bin ]] && { mkdir -p ${cache:h}; print -r -- $bin >| $cache; }
+        fi
+        [[ -x $bin/node ]] && export PATH="$bin:$PATH" NVM_BIN="$bin"
+    }
+    nvm() {
+        unfunction nvm
+        source "$NVM_DIR/nvm.sh" --no-use
+        [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+        nvm "$@"
+    }
+fi
 
 
-# Load Angular CLI autocompletion.
-if command -v ng &> /dev/null; then
-    source <(ng completion script)
+# Load Angular CLI autocompletion (cached; regenerated when ng is upgraded).
+if (( $+commands[ng] )); then
+    _cached_source ng-completion ng ng completion script
 fi
 
 # SSH autocompletion for zsh
@@ -279,9 +352,9 @@ if [ -f ~/.git-completion.zsh ]; then
     source ~/.git-completion.zsh
 fi
 
-# Kubectl completion for zsh
-if command -v kubectl &> /dev/null; then
-    source <(kubectl completion zsh)
+# Kubectl completion for zsh (cached; regenerated when kubectl is upgraded)
+if (( $+commands[kubectl] )); then
+    _cached_source kubectl-completion kubectl kubectl completion zsh
     alias k=kubectl
     compdef k=kubectl
 fi

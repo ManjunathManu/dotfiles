@@ -297,6 +297,9 @@ sso() {
   # local res="$(aws configure export-credentials --profile "$profile" --format env)"
   # echo res
   eval "$(aws configure export-credentials --profile "$profile" --format env)"
+  # Short name (dev/prod/mprod) for the kitty tab bar; expiry comes from
+  # AWS_CREDENTIAL_EXPIRATION, which export-credentials sets above
+  export AWS_SSO_NAME="$profile"
   echo "✅ AWS credentials exported for profile: $profile"
 }
 
