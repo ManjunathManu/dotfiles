@@ -38,7 +38,7 @@ require("lazy").setup({
         -- Load default mappings first
         api.config.mappings.default_on_attach(bufnr)
 
-        -- Explicit mouse mappings for better tmux compatibility
+        -- Explicit mouse mappings
         vim.keymap.set("n", "<LeftRelease>", function()
           local node = api.tree.get_node_under_cursor()
           if node then

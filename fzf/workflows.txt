@@ -32,14 +32,6 @@ docker system prune -a | Docker | Clean up all unused Docker resources
 docker logs -f CONTAINER | Docker | Follow container logs
 docker exec -it CONTAINER bash | Docker | Enter container shell
 
-# Tmux Commands
-tx | tmux | Tmux session selector
-tmux new-session -s NAME | tmux | Create new tmux session
-tmux kill-session -t NAME | tmux | Kill tmux session
-tmux list-sessions | tmux | List all sessions
-tmux attach -t NAME | tmux | Attach to existing session
-tmux detach | tmux | Detach from current session
-
 # Navigation
 work lisa | navigate | Navigate to Lisa project
 work ttd | navigate | Navigate to TTD project

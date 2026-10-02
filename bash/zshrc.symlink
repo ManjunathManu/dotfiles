@@ -40,7 +40,7 @@ if [ ! -d "$ZSH_PLUGIN_DIR/fzf-tab" ]; then
     git clone https://github.com/Aloxaf/fzf-tab.git "$ZSH_PLUGIN_DIR/fzf-tab"
 fi
 
-# Add homebrew completions to fpath (needed for non-login shells like tmux panes)
+# Add homebrew completions to fpath (needed for non-login shells)
 if [[ -d /opt/homebrew/share/zsh/site-functions ]]; then
     fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
 fi
@@ -87,7 +87,7 @@ export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 bindkey '^ ' autosuggest-accept  # Ctrl+Space to accept
 
-# Fix backspace in middle of line (iTerm2 + tmux compatibility)
+# Fix backspace in middle of line (some terminals send ^H instead of ^?)
 bindkey '^?' backward-delete-char
 bindkey '^H' backward-delete-char
 

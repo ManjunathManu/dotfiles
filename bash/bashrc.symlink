@@ -184,9 +184,8 @@ if [ -f ~/.git-completion.bash ]; then
   . ~/.git-completion.bash
 fi
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# mise: Node + Python versions (replaced nvm + pyenv), same config as zsh
+command -v mise >/dev/null 2>&1 && eval "$(mise activate bash)"
 
 # Load Angular CLI autocompletion.
 if command -v ng &> /dev/null; then

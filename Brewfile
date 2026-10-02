@@ -23,7 +23,6 @@ brew "bash-completion", link: false
 brew "fzf"
 brew "zoxide"             # smart cd
 brew "atuin"              # searchable shell history (atuin/config.toml.symlink)
-brew "tmux"               # ⚠ replaced by kitty; remove once you no longer need it as a fallback
 
 # ── Modern CLI replacements ──────────────────────────────────────────────────
 brew "bat"                # cat
@@ -68,7 +67,6 @@ brew "stylua"
 # ── Languages & version managers ─────────────────────────────────────────────
 # Node + Python versions come from mise (mise/config.toml.symlink), not Homebrew.
 brew "mise"
-brew "pyenv"              # ⚠ replaced by mise; keep until ~/.pyenv versions are no longer needed
 brew "python@3.9", link: false
 brew "pipx"
 brew "uv"
@@ -107,7 +105,6 @@ brew "poppler"
 # ── Desktop apps ─────────────────────────────────────────────────────────────
 cask "hammerspoon"
 cask "macgesture"
-cask "warp"               # ⚠ another terminal; remove if kitty has replaced it
 
 # ── Global npm packages (need Node from mise) ────────────────────────────────
 npm "@angular/cli"

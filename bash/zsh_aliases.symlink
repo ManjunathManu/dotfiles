@@ -114,21 +114,6 @@ function sec_grp_update(){
   `which node $HOME/workspace/source-code/lightmetrics/nodejs/misc/aws-utils/src/update-sg.js` $1;
 }
 
-# *****************TMUX*******************
-
-# Start tmux
-function tx(){
- bash "$HOME/workspace/source-code/personal/dotfiles/bin/tm"
-}
-
-alias tmux='tmux -u'
-
-# Kill tmux session
-alias tks='tmux kill-session'
-
-# List all tmux sessions
-alias tls='tmux list-sessions'
-
 # *****************GIT HOOKS*******************
 
 # `pre-commit install` refuses while the global core.hooksPath is set (the
@@ -190,8 +175,6 @@ alias vimrc='vim ~/.vimrc'
 alias brc='vim ~/.bashrc'
 
 alias zrc='vim ~/.zshrc'
-
-alias tmuxconf='vim ~/.tmux.conf'
 
 alias baliases='vim ~/.bash_aliases'
 

@@ -61,7 +61,7 @@ opt.timeoutlen = 300
 -- Completion
 opt.completeopt = "menu,menuone,noselect"
 
--- Mouse (enable for all modes, essential for tmux compatibility)
+-- Mouse (enable for all modes)
 opt.mouse = "a"
 opt.mousemoveevent = true  -- Enable mouse move events for better plugin support
 

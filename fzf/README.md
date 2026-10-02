@@ -17,7 +17,7 @@ This guide covers the Warp-inspired terminal enhancements added to your dotfiles
 
 ## Overview
 
-These enhancements bring modern terminal features to Terminal.app without requiring Warp or other specialized terminal applications. All features work seamlessly with your existing tmux setup.
+These enhancements bring modern terminal features to Terminal.app without requiring Warp or other specialized terminal applications.
 
 **Tools Used:**
 - **fzf**: Fuzzy finder for fast searching
@@ -57,7 +57,7 @@ source ~/.zshrc
 
 ### Command Palette
 
-A searchable menu of commonly used commands organized by category (Git, AWS, Docker, tmux, etc.).
+A searchable menu of commonly used commands organized by category (Git, AWS, Docker, etc.).
 
 **Usage:**
 1. Press `Ctrl+G` to open the command palette
@@ -70,7 +70,6 @@ A searchable menu of commonly used commands organized by category (Git, AWS, Doc
 - Git commands (status, diff, commit, push, etc.)
 - AWS commands (profile switching, SSO, SSM)
 - Docker commands (container management, logs)
-- Tmux commands (session management)
 - Navigation shortcuts
 - NPM commands
 - Nginx commands
@@ -385,31 +384,6 @@ fd --version
 bat --version
 ```
 
-### Works outside tmux but not inside
-
-**Verify enhanced config is sourced in tmux:**
-
-Inside tmux:
-```bash
-echo $HISTSIZE  # Should be 50000
-command -v fzf  # Should show path
-```
-
-If not working, ensure tmux shells are login shells. Add to `~/.tmux.conf`:
-```
-set -g default-command "${SHELL}"
-```
-
-### Keybindings conflict with tmux
-
-If `Ctrl+G` or other shortcuts don't work in tmux, check for conflicts in `~/.tmux.conf`:
-
-```bash
-grep -E "bind.*C-g" ~/.tmux.conf
-```
-
-Change the conflicting binding or use a different key for command palette.
-
 ## Verification Commands
 
 Run these to verify your setup:
@@ -442,7 +416,6 @@ bindkey | grep -E "\\^R|\\^G|\\^T"
 5. **Preview files** - Press `?` in fzf to see file contents before opening
 6. **Multi-select** - Use `Tab` in fzf to select multiple files at once
 7. **Cross-session history** - Commands from other terminals appear instantly
-8. **Tmux compatible** - All features work inside tmux sessions
 
 ## Resources
 

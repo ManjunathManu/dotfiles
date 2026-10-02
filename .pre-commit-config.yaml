@@ -16,10 +16,8 @@ repos:
     hooks:
       - id: shellcheck
         args: ["--severity=warning", "--external-sources"]
-        # shellcheck can't parse zsh; tmux/*.sh are tmux config, not shell;
-        # install_nvm.sh is the old vendored nvm installer (superseded by mise)
+        # shellcheck can't parse zsh
         exclude_types: [zsh]
-        exclude: ^(tmux/|install_nvm\.sh$)
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0

@@ -4,123 +4,90 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a personal dotfiles repository for macOS/Linux development environment configuration. It manages shell configurations (bash/zsh), tmux settings, vim configuration, and automated installation of development tools.
+Personal dotfiles for macOS (branch `mac`; the repo is **public** on GitHub). It manages the kitty terminal, zsh (and bash), Neovim, git, and the installation of every tool via a Brewfile and mise.
 
 ## Architecture
 
 ### Symlink-Based Configuration System
 
-The core architecture uses symbolic links to manage dotfiles:
+`install/link.sh` links every `*.symlink` file or directory (up to 3 levels deep):
 
-- Files ending with `.symlink` are automatically linked to `$HOME/.{basename}` by `install/link.sh`
-- Examples:
-  - `bash/bashrc.symlink` → `~/.bashrc`
-  - `tmux/tmux.conf.symlink` → `~/.tmux.conf`
-  - `vim/vimrc.symlink` → `~/.vimrc`
+- Default: `dir/name.symlink` → `~/.name` (e.g. `bash/zshrc.symlink` → `~/.zshrc`, `git/git-hooks.symlink/` → `~/.git-hooks`)
+- Directories listed in `link.sh` go to `~/.config/<dir>/<name>` instead: starship, lazygit, nvim, kitty, bat, mise, atuin (e.g. `kitty/kitty.conf.symlink` → `~/.config/kitty/kitty.conf`). Add a new tool's directory to that list.
+- A `.symlink` *directory* is linked as a whole (e.g. `kitty/sessions.symlink/`).
 
 ### Installation System
 
-The installation process is orchestrated through `install.sh`, which sources three modular scripts:
+`install.sh` runs, in order:
 
-1. **install/stack.sh** - Installs Homebrew, mise + Node/Python (`mise/config.toml.symlink`), then everything in `Brewfile` (`brew bundle`). New tools go in the Brewfile, not as separate install steps
-2. **install/link.sh** - Creates symlinks for all `.symlink` files
-3. **install/git.sh** - Interactive git global configuration
-
-All scripts use helper functions from `utils.sh` for consistent output formatting and command execution.
+1. **install/stack.sh** - Homebrew, then mise + Node/Python (`mise/config.toml.symlink`), then everything in `Brewfile` (`brew bundle`), then pre-commit (via `uv tool`). New tools go in the Brewfile, not as separate install steps.
+2. **install/link.sh** - Creates the symlinks above
+3. **install/git.sh** - Writes name/email (+ optional personal-repo email) to `~/.gitconfig.local`
+4. **install/fzf_setup.sh**, **install/zsh_plugins_setup.sh**
 
 ### Directory Structure
 
-- `bash/` - Bash and Zsh configurations with aliases
-- `tmux/` - Tmux configuration with custom theme and keybindings
-- `vim/` - Vim configuration using Vundle plugin manager
-- `install/` - Installation scripts for environment setup
-- `bin/` - Custom executable scripts
-- `config/` - Machine-local settings: `*.local.sh` files are gitignored; `aws.example.sh` is the template for `aws.local.sh` (AWS profiles, TEAM settings)
-- `utils.sh` - Shared bash utility functions for styled output and command execution
-- `Brewfile` - Every Homebrew formula, cask, global npm package and VS Code extension; check with `brew bundle check --file=Brewfile`
+- `kitty/` - kitty config, custom tab bar (`tab_bar.py.symlink`), auto dark/light themes, sessions, quick-access terminal
+- `bash/` - zsh (`zshrc`, `zprofile`, `zsh_aliases`, `enhanced_zsh`) and bash equivalents; `zsh_cache.zsh` (startup cache helper, sourced by path, not linked)
+- `nvim/` - Neovim 0.12 config (lazy.nvim, native LSP)
+- `vim/` - plain vim config (vim is still `$EDITOR` and git's editor)
+- `git/` - `gitconfig.symlink` (shared settings + delta themes), `git-hooks.symlink/` (global hook dispatcher)
+- `mise/`, `atuin/`, `bat/`, `starship/`, `lazygit/`, `fzf/` - tool configs
+- `install/` - installation scripts; `bin/` - custom scripts (e.g. `team-request`)
+- `config/` - machine-local settings: `*.local.sh` is gitignored; `aws.example.sh` is the template for `aws.local.sh` (TEAM settings)
+- `utils.sh` - shared bash helpers for install scripts
+- `Brewfile` - every formula, cask, global npm package and VS Code extension (`brew bundle check --file=Brewfile`)
 
 ## Key Commands
 
-### Initial Setup
-
 ```bash
-# Full installation (installs tools, creates symlinks, configures git)
-./install.sh
-
-# Install only symlinks
-source install/link.sh
-
-# Configure git globally (interactive)
-source install/git.sh
+./install.sh                         # full setup on a new Mac
+source install/link.sh               # (re)create symlinks only
+brew bundle check --file=Brewfile    # anything missing?
+pre-commit run --all-files           # gitleaks + shellcheck + basic checks
 ```
 
-### Testing Changes
-
-After modifying configuration files:
+Testing changes:
 
 ```bash
-# For bash changes
-source ~/.bashrc
-
-# For zsh changes
-source ~/.zshrc
-
-# For tmux changes (from within tmux)
-tmux source-file ~/.tmux.conf
-# Or use the configured keybinding: Ctrl+A then r
+exec zsh                             # reload zsh (or open a new kitty tab)
+# kitty: Ctrl+Cmd+,  reloads kitty.conf; tab_bar.py changes need Cmd+Q and reopen
+zsh -n file; bash -n file            # syntax only; also dry-run scripts, it misses logic bugs
 ```
 
 ## Configuration Details
 
-### Tmux Customizations
+### Shell (zsh)
 
-- Prefix key: `Ctrl+A` (instead of default `Ctrl+B`)
-- Vim-style keybindings in copy mode
-- Mouse support enabled
-- Reload config: `Ctrl+A` then `r`
-- macOS clipboard integration via `pbcopy`/`pbpaste`
+- Startup ~0.27s. Slow `tool init`/completion output is cached by `_cached_source` (`bash/zsh_cache.zsh`, cache in `~/.cache/zsh`, keyed on the tool's real path).
+- **Never cache `mise activate`**: its output embeds the current `$PATH`. brew's `shellenv` is safe to cache (uses `${PATH+:$PATH}`).
+- `bindkey -v` is set explicitly before any other `bindkey`; zsh only auto-picks vi mode if `$EDITOR` contains "vi" at that moment.
+- atuin is initialized last (after `~/.enhanced_zsh`, which loads fzf's Ctrl+R) with `--disable-up-arrow --disable-ai`.
+- A precmd hook sends kitty user vars (`aws_sso`, `aws_expires`) for the tab bar; `sso <name>` exports `AWS_SSO_NAME`.
 
-### Shell Configuration
+### kitty
 
-Both bash and zsh configurations are maintained:
+- No tmux-style prefix: `cmd+…` for splits/tabs/hints/sessions, kitty defaults otherwise.
+- Kitty started from the Dock has `PATH=/usr/bin:/bin:/usr/sbin:/sbin`: use absolute paths in kitty.conf (e.g. `scrollback_pager /opt/homebrew/bin/nvim …`) and in `tab_bar.py` subprocesses.
+- Theme overrides go in `dark-theme.auto.conf` / `light-theme.auto.conf` (they load after kitty.conf).
+- `tab_bar.py` must never block: no network calls, slow work on `add_timer`.
 
-- `bashrc.symlink` / `zshrc.symlink` - Main shell configuration
-- `bash_aliases.symlink` / `zsh_aliases.symlink` - Command aliases
-- SSH and kubectl autocompletion enabled in bashrc
+### git
 
-### Vim Setup
+- `~/.gitconfig` is a symlink into this public repo: personal values (name, email) go in `~/.gitconfig.local` via `git config --file`, **never** `git config --global`.
+- Repos under `~/workspace/source-code/personal/` use the personal email (`includeIf` → `~/.gitconfig.personal`).
+- Global `core.hooksPath = ~/.git-hooks`: `_dispatch` runs gitleaks on pre-commit, then the repo's own `.git/hooks/<name>`. Repos with their own `core.hooksPath` (husky `.husky`) bypass it. `pre-commit install` needs `GIT_CONFIG_GLOBAL=/dev/null` (the zsh `pre-commit` wrapper does this).
 
-- Uses Vundle as plugin manager
-- Plugins include: vim-fugitive, nerdtree, ctrlp.vim
-- vim-airline for enhanced status line
-- Comment highlighting enabled for JSON files
+### Node / Python
+
+- mise only (nvm and pyenv are gone). Defaults in `mise/config.toml.symlink`; projects switch via `mise.toml`, `.nvmrc` or `.python-version`.
+- Homebrew's `python@3.14` can't load `pyexpat` on macOS 26.0, so pre-commit is installed with `uv tool` on mise's Python.
 
 ## Working with This Repository
 
-### Adding New Dotfiles
-
-1. Create file with `.symlink` extension (e.g., `bash/new_config.symlink`)
-2. Run `source install/link.sh` to create the symlink
-3. The file will be linked to `~/.new_config`
-
-### Modifying Installation Scripts
-
-- All installation scripts use functions from `utils.sh` for consistency
-- Available utility functions: `h1()`, `h2()`, `info()`, `success()`, `error()`, `runCommand()`
-- The `runCommand()` function handles command execution with automatic error checking and logging
-- Use `typeExists()` to check if a command is available before attempting installation
-
-### Platform Differences
-
-The repository supports both macOS and Linux:
-
-- macOS-specific: Uses `pbcopy`/`pbpaste` for clipboard in tmux
-- Linux-specific: Some package installation commands may differ (commented out brew references suggest migration from apt-get)
-- Git credential helper automatically selects `osxkeychain` for macOS, `cache` or `store` for Linux
-
-## Current State
-
-The repository is configured for macOS (branch: `mac`), with some Linux-specific code commented out in installation scripts. Recent work includes updates to bash configuration for SSH/kubectl autocompletion and tmux theme customizations.
+- Install scripts use `utils.sh`: `h1`, `h2`, `info`, `success`, `error`, `typeExists`, `runCommand`. `runCommand` runs inside `$(…)` (output hidden unless it fails), so use it for quick non-interactive steps; run interactive or long commands directly.
+- Shell scripts must pass shellcheck at warning level (the pre-commit hook enforces it; zsh files are excluded). macOS `/bin/bash` is 3.2: no `mapfile`, no associative arrays.
+- Before printing anything from history, configs or logs, check for secrets and print counts, not values.
 
 ## Quick Questions section
 

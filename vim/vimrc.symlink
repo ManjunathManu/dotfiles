@@ -122,8 +122,8 @@ function! s:SetPythonVirtualEnv()
     endif
   endfor
 
-  " Fall back to pyenv shim - silently
-  call coc#config('python.defaultInterpreterPath', '/Users/manju/.pyenv/shims/python')
+  " Fall back to whatever python3 is on PATH (mise) - silently
+  call coc#config('python.defaultInterpreterPath', exepath('python3'))
 endfunction
 
 " Auto-detect venv when opening Python files (only if CoC is loaded)
