@@ -20,21 +20,18 @@
     side-by-side = true
     # Navigate between diff sections with n/N
     navigate = true
-    # Syntax highlighting theme (compatible with dark terminals)
-    syntax-theme = Monokai Extended
+    # Colors: Tokyo Night (matches kitty + nvim). Dark by default; zshrc sets
+    # DELTA_FEATURES=+modus-operandi when macOS is in Light mode.
+    # Syntax themes live in bat/themes (run `bat cache --build` after changes).
+    features = tokyonight-night
     # Show file paths in the header
     file-style = bold yellow
     file-decoration-style = none
     # Highlight changes within lines
     hunk-header-decoration-style = blue box
     hunk-header-file-style = red
-    hunk-header-line-number-style = "#067a00"
+    hunk-header-line-number-style = green
     hunk-header-style = file line-number syntax
-    # Customize added/removed line styles
-    minus-style = syntax "#3f0001"
-    minus-emph-style = syntax "#900000"
-    plus-style = syntax "#003800"
-    plus-emph-style = syntax "#006000"
     # Configure whitespace error highlighting
     whitespace-error-style = 22 reverse
     # Show line numbers in left margin
@@ -42,8 +39,38 @@
     line-numbers-right-format = "{np:>4}│"
     line-numbers-left-style = cyan
     line-numbers-right-style = cyan
-    line-numbers-minus-style = 124
-    line-numbers-plus-style = 28
+
+# Tokyo Night colors from folke/tokyonight.nvim extras/delta
+[delta "tokyonight-night"]
+    syntax-theme = tokyonight_night
+    minus-style                   = syntax "#4a272f"
+    minus-non-emph-style          = syntax "#4a272f"
+    minus-emph-style              = syntax "#713137"
+    minus-empty-line-marker-style = syntax "#4a272f"
+    line-numbers-minus-style      = "#914c54"
+    plus-style                    = syntax "#243e4a"
+    plus-non-emph-style           = syntax "#243e4a"
+    plus-emph-style               = syntax "#2c5a66"
+    plus-empty-line-marker-style  = syntax "#243e4a"
+    line-numbers-plus-style       = "#449dab"
+    line-numbers-zero-style       = "#3b4261"
+
+# Light mode: Modus Operandi (WCAG AAA). Tokyo Night Day was too low-contrast.
+# syntax-theme "ansi" uses the terminal's 16 colors = Modus palette in kitty.
+# Diff backgrounds from the Modus themes (bg-removed/added and -refine).
+[delta "modus-operandi"]
+    syntax-theme = ansi
+    minus-style                   = syntax "#ffd8d5"
+    minus-non-emph-style          = syntax "#ffd8d5"
+    minus-emph-style              = syntax "#ffbfbf"
+    minus-empty-line-marker-style = syntax "#ffd8d5"
+    line-numbers-minus-style      = "#8f1313"
+    plus-style                    = syntax "#c9ffea"
+    plus-non-emph-style           = syntax "#c9ffea"
+    plus-emph-style               = syntax "#b3efcf"
+    plus-empty-line-marker-style  = syntax "#c9ffea"
+    line-numbers-plus-style       = "#005000"
+    line-numbers-zero-style       = "#595959"
 
 [merge]
     conflictstyle = diff3

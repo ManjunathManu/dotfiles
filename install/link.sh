@@ -17,7 +17,8 @@ find -H "$DOTFILES" -maxdepth 3 -name '*.symlink' | while IFS= read -r file; do
   # Special handling for .config subdirectories
   if [[ "$dir_name" == "starship" ]] || [[ "$dir_name" == "lazygit" ]] || \
      [[ "$dir_name" == "nvim" ]] || [[ "$dir_name" == "alacritty" ]] || \
-     [[ "$dir_name" == "wezterm" ]]; then
+     [[ "$dir_name" == "wezterm" ]] || [[ "$dir_name" == "kitty" ]] || \
+     [[ "$dir_name" == "bat" ]]; then
     # Create .config subdirectory if it doesn't exist
     config_dir="$HOME/.config/$dir_name"
     mkdir -p "$config_dir"

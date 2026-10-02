@@ -1,0 +1,10 @@
+# Quake-style drop-down terminal (kitty 0.42+)
+# Trigger: bind a global hotkey once in
+#   System Settings → Keyboard → Keyboard Shortcuts → Services → General → "Quick access to kitty"
+# Or toggle from a shell: kitten quick-access-terminal
+# Docs: https://sw.kovidgoyal.net/kitty/kittens/quick-access-terminal/
+
+edge top
+lines 20
+background_opacity 0.9
+hide_on_focus_loss yes

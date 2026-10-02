@@ -1,0 +1,16 @@
+# Dotfiles workspace — open with Cmd+Shift+S (goto_session)
+# Syntax: https://sw.kovidgoyal.net/kitty/sessions/
+
+new_tab code
+layout splits
+cd ~/workspace/source-code/personal/dotfiles
+launch --title nvim nvim
+focus
+launch --location=hsplit --bias=25 --title shell
+
+new_tab git
+layout stack
+cd ~/workspace/source-code/personal/dotfiles
+launch --title lazygit lazygit
+
+focus_tab 0

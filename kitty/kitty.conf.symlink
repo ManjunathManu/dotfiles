@@ -1,0 +1,218 @@
+# vim:fileencoding=utf-8:foldmethod=marker:ft=kitty
+#
+# Kitty config — tuned for development, kitty-native (no tmux-style prefix).
+# Linked to ~/.config/kitty/kitty.conf by install/link.sh
+#
+# Philosophy:
+#   - cmd+…        everyday actions (splits, tabs, sessions, hints)
+#   - ctrl+shift+… kitty defaults (kitty_mod) still work for everything else
+#   - No prefix key: Ctrl+A / Ctrl+hjkl go straight to the shell and nvim
+#
+# Built-ins worth remembering:
+#   cmd+,          edit this file          ctrl+cmd+,   reload config
+#   cmd+f          search scrollback       ctrl+shift+h open scrollback in pager
+#   ctrl+l         clear (shell)           ctrl+shift+u unicode input
+#   ctrl+shift+f2  edit config (fallback)  ctrl+shift+escape kitty shell
+#
+# Docs: https://sw.kovidgoyal.net/kitty/conf/
+
+#: Fonts {{{
+
+font_family      family="JetBrainsMono Nerd Font Mono"
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
+font_size        16.0
+
+# Ligatures on, but split apart under the cursor so code is easy to edit
+disable_ligatures cursor
+
+#: }}}
+
+#: Cursor {{{
+
+cursor_shape          block
+cursor_blink_interval 0
+# No cursor trail: the animation fired on every redraw while typing (syntax
+# highlighting / autosuggestions move the cursor), which looked like flicker
+cursor_trail          0
+
+#: }}}
+
+#: Scrollback {{{
+
+# Kept small for memory: scrollback is allocated per window (split), so it
+# multiplies with every split and tab you have open.
+scrollback_lines              5000
+# Extra pager-only history beyond scrollback_lines; 0 = off (kitty default)
+scrollback_pager_history_size 0
+# Pager stays `less` (default). The nvim pager recipe needs nvim >= 0.12.
+scrollbar                     scrolled
+
+#: }}}
+
+#: Mouse & clipboard {{{
+
+mouse_hide_wait       3.0
+copy_on_select        clipboard
+strip_trailing_spaces smart
+# Quote URLs pasted at the prompt; confirm pastes > 16KB
+paste_actions         quote-urls-at-prompt,confirm-if-large
+detect_urls           yes
+
+#: }}}
+
+#: Window layout (splits) {{{
+
+# splits: free-form vsplit/hsplit · stack: zoom · tall: one big + stacked side
+enabled_layouts      splits:split_axis=auto,stack,tall
+window_padding_width 4
+draw_minimal_borders yes
+# Dim unfocused windows so the active split is obvious
+inactive_text_alpha  0.75
+# Hovering the mouse over a split focuses it
+focus_follows_mouse  yes
+confirm_os_window_close -1
+
+#: }}}
+
+#: Tab bar {{{
+
+tab_bar_edge        top
+# custom = tab_bar.py: powerline tabs (left) + status segments (right):
+# AWS (sso) · load · local IP · UTC timestamp
+# Edit SEGMENTS in tab_bar.py to hide or reorder. Set back to `powerline` to disable.
+tab_bar_style       custom
+tab_powerline_style slanted
+tab_bar_min_tabs    1
+tab_activity_symbol " ●"
+tab_title_template  "{index}: {title}{bell_symbol}{activity_symbol}"
+
+#: }}}
+
+#: Shell integration & notifications {{{
+
+# zsh/bash detected automatically: enables prompt jumping, last-command output,
+# cwd tracking for new splits/tabs, and command-finished notifications.
+# no-cursor: keep the block cursor at the prompt instead of switching to a
+# beam in vi insert mode
+shell_integration enabled no-cursor
+
+# Notify when a command longer than 15s finishes while kitty isn't focused
+notify_on_cmd_finish unfocused 15
+
+#: }}}
+
+#: Remote control {{{
+
+# Needed by kittens/scripts that drive kitty (e.g. `kitten @ ls`)
+allow_remote_control socket-only
+listen_on            unix:/tmp/kitty
+
+#: }}}
+
+#: macOS {{{
+
+# Left Option = Alt (for shell/nvim), right Option still types special chars
+macos_option_as_alt               left
+macos_quit_when_last_window_closed yes
+hide_window_decorations           titlebar-only
+# Updates come from brew
+update_check_interval             0
+
+#: }}}
+
+#: Keyboard shortcuts {{{
+
+#: Splits (kitty "windows") {{{
+
+map cmd+d       launch --location=vsplit --cwd=current
+map cmd+shift+d launch --location=hsplit --cwd=current
+map cmd+w       close_window
+# Zoom the current split
+map cmd+enter   toggle_layout stack
+# Interactive resize: arrows / hjkl, Esc to finish
+map cmd+r       start_resizing_window
+
+# Move between splits with one modifier. Replaces macOS/kitty defaults:
+#   cmd+h hide app · cmd+k clear to cursor · cmd+l clear last command
+#   (use ctrl+l in the shell to clear)
+map cmd+h neighboring_window left
+map cmd+j neighboring_window down
+map cmd+k neighboring_window up
+map cmd+l neighboring_window right
+# Toggle between the two most recent splits
+map cmd+; nth_window -1
+# Cycle through splits in order
+map cmd+] next_window
+map cmd+[ previous_window
+# Show a number on each split, press it to jump
+map cmd+g focus_visible_window
+
+# Rotate split orientation / swap with a chosen split
+map cmd+alt+r layout_action rotate
+map cmd+alt+x swap_with_window
+
+#: }}}
+
+#: Tabs {{{
+
+map cmd+t new_tab_with_cwd
+map cmd+1 goto_tab 1
+map cmd+2 goto_tab 2
+map cmd+3 goto_tab 3
+map cmd+4 goto_tab 4
+map cmd+5 goto_tab 5
+map cmd+6 goto_tab 6
+map cmd+7 goto_tab 7
+map cmd+8 goto_tab 8
+map cmd+9 goto_tab 9
+# Previous tab (like `cd -`)
+map cmd+0 goto_tab -1
+
+# Rename tab with an empty prompt (built-in set_tab_title pre-fills the old name).
+# Runs in an overlay in the same tab; empty input / Esc / Ctrl+C cancels.
+map cmd+shift+i launch --type=overlay --allow-remote-control bash -c 'read -rep "Rename tab: " t && [ -n "$t" ] && kitten @ set-tab-title -- "$t"'
+
+#: }}}
+
+#: Shell integration {{{
+
+# Jump between command prompts in scrollback (overrides line scrolling)
+map cmd+up        scroll_to_prompt -1
+map cmd+down      scroll_to_prompt 1
+# Open the last command's output in the pager — great for long build/test logs
+map cmd+shift+g   show_last_command_output
+
+#: }}}
+
+#: Hints: act on visible text {{{
+
+# Open a URL on screen
+map cmd+shift+e open_url_with_hints
+# Pick file:line from compiler/test/grep output → opens in $EDITOR (nvim)
+map cmd+shift+o kitten hints --type linenum
+# Insert a file path from the screen into the prompt
+map cmd+shift+p kitten hints --type path --program -
+# Copy a git hash to the clipboard
+map cmd+shift+y kitten hints --type hash --program @
+# Fuzzy file picker with preview; inserts the chosen path
+map cmd+p       kitten choose-files
+
+#: }}}
+
+#: Sessions (per-project workspaces) {{{
+
+# Pick/switch project sessions from ~/.config/kitty/sessions/
+map cmd+shift+s goto_session ~/.config/kitty/sessions
+# Jump back to the previous session
+map cmd+shift+minus goto_session -1
+# Save current layout (with running programs) as a new session file
+map cmd+alt+s   save_as_session --relocatable --use-foreground-process --base-dir ~/.config/kitty/sessions
+
+#: }}}
+
+#: }}}
+
+# Theme: dark-theme.auto.conf (Tokyo Night) in this folder is loaded
+# automatically when macOS is in dark mode. Add light-theme.auto.conf for light.
