@@ -22,7 +22,7 @@ The core architecture uses symbolic links to manage dotfiles:
 
 The installation process is orchestrated through `install.sh`, which sources three modular scripts:
 
-1. **install/stack.sh** - Installs development tools (NVM, Angular CLI, Docker, AWS CLI, tmux, Python, vim, Nginx)
+1. **install/stack.sh** - Installs Homebrew, nvm + Node, then everything in `Brewfile` (`brew bundle`). New tools go in the Brewfile, not as separate install steps
 2. **install/link.sh** - Creates symlinks for all `.symlink` files
 3. **install/git.sh** - Interactive git global configuration
 
@@ -37,6 +37,7 @@ All scripts use helper functions from `utils.sh` for consistent output formattin
 - `bin/` - Custom executable scripts
 - `config/` - Machine-local settings: `*.local.sh` files are gitignored; `aws.example.sh` is the template for `aws.local.sh` (AWS profiles, TEAM settings)
 - `utils.sh` - Shared bash utility functions for styled output and command execution
+- `Brewfile` - Every Homebrew formula, cask, global npm package and VS Code extension; check with `brew bundle check --file=Brewfile`
 
 ## Key Commands
 
