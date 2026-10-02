@@ -32,25 +32,6 @@ if [[ $configGit =~ ^([Yy])$ ]]; then
   git config --file "$LOCAL" github.user "${github:-$defaultGithub}"
   git config --file "$LOCAL" core.editor "${editor:-$defaultGitEditor}"
 
-  # Sign commits/tags with an SSH key (gpg.format = ssh is in the tracked config)
-  KEY="$HOME/.ssh/id_ed25519.pub"
-  if [ -f "$KEY" ]; then
-    newLine
-    read -rn 1 -p "Sign commits and tags with $KEY? [y/n]: " sign
-    if [[ $sign =~ ^([Yy])$ ]]; then
-      git config --file "$LOCAL" user.signingkey "$KEY"
-      git config --file "$LOCAL" commit.gpgSign true
-      git config --file "$LOCAL" tag.gpgSign true
-      mkdir -p "$HOME/.config/git"
-      printf '%s namespaces="git" %s\n' "$(git config --file "$LOCAL" user.email)" "$(cut -d' ' -f1,2 "$KEY")" \
-        > "$HOME/.config/git/allowed_signers"
-      newLine
-      note "Add the key to GitHub as a *signing* key for the Verified badge:"
-      note "  gh auth refresh -h github.com -s admin:ssh_signing_key"
-      note "  gh ssh-key add $KEY --type signing --title \"$(hostname -s) signing\""
-    fi
-  fi
-
   if [[ "$( uname )" == "Darwin" ]]; then
     git config --file "$LOCAL" credential.helper "osxkeychain"
   else

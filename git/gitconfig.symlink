@@ -129,13 +129,6 @@
     # Typo'd command: suggest the fix and ask before running it
     autocorrect = prompt
 
-# Commit signing with SSH keys. Which key, and whether to sign, is per
-# machine: set in ~/.gitconfig.local (install/git.sh offers to configure it).
-[gpg]
-    format = ssh
-[gpg "ssh"]
-    # Lets `git log --show-signature` verify signatures locally
-    allowedSignersFile = ~/.config/git/allowed_signers
 
 [pager]
     diff = delta
