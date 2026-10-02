@@ -10,7 +10,7 @@
 #     them, kube context only in Kubernetes folders (red for prod contexts).
 #   - Icons are Nerd Font codepoints by name (nerdfonts.com/cheat-sheet).
 #
-#   lm-commons  master [!2?1] 󰎙 22.22.0 󰸏 dev                   took 3s
+#   lm-commons  master [!2?1] 󰏗 v0.1.5 󰎙 22.22.0 󰸏 dev           took 3s
 #   ❯                    (❮ in vi normal mode, red after a failed command)
 
 "$schema" = 'https://starship.rs/config-schema.json'
@@ -24,6 +24,7 @@ $directory\
 $git_branch\
 $git_state\
 $git_status\
+$package\
 $nodejs\
 $python\
 $rust\
@@ -91,6 +92,14 @@ modified = "!${count}"
 staged = "+${count}"
 renamed = "»${count}"
 deleted = "✘${count}"
+
+# ── Project version (package.json, pyproject.toml, Cargo.toml, ...) ─────────
+[package]
+symbol = "\U000F03D7 "
+format = "[$symbol$version]($style) "
+style = "bold bright-blue"
+# Most internal projects are "private": true; show their version too
+display_private = true
 
 # ── Languages: only inside projects that use them ────────────────────────────
 [nodejs]
@@ -184,7 +193,5 @@ style = "bold blue"
 disabled = true      # can't read `sso`'s expiry; see env_var.STARSHIP_AWS*
 [gcloud]
 disabled = true
-[package]
-disabled = true      # package.json version is rarely useful in a prompt
 [time]
 disabled = true      # the kitty tab bar shows UTC; macOS shows local time
