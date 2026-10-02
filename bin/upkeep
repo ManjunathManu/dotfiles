@@ -1,0 +1,99 @@
+#!/bin/bash
+# Monthly dev-environment upkeep check. Reports what has updates; never
+# upgrades anything itself.
+#
+#   upkeep            print the report (zsh alias in zsh_aliases.symlink)
+#   upkeep --notify   also show a macOS notification if anything is due
+#                     (used by launchd/dev.dotfiles.upkeep.plist, 1st of each month)
+#
+# Report is saved to ~/.cache/upkeep/report.txt.
+
+set -u
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$HOME/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export HOMEBREW_NO_ENV_HINTS=1
+
+DOTFILES="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+REPORT_DIR="$HOME/.cache/upkeep"
+REPORT="$REPORT_DIR/report.txt"
+mkdir -p "$REPORT_DIR"
+
+due=0          # number of things with updates
+summary=()     # short parts for the notification
+
+{
+  echo "Dev upkeep: $(date '+%Y-%m-%d %H:%M')"
+  echo
+
+  # ── Homebrew ───────────────────────────────────────────────────────────────
+  brew update --quiet >/dev/null 2>&1
+  formulae=$(brew outdated --formula --quiet 2>/dev/null)
+  casks=$(brew outdated --cask --quiet 2>/dev/null)
+  nf=$(printf '%s' "$formulae" | grep -c .)
+  nc=$(printf '%s' "$casks" | grep -c .)
+  echo "Homebrew: $nf formulae, $nc apps outdated"
+  if [ "$nf" -gt 0 ]; then printf '  %s\n' "$formulae" | paste -sd' ' - | fold -s -w 78 | sed 's/^/  /'; fi
+  if [ "$nc" -gt 0 ]; then echo "  apps: $(printf '%s' "$casks" | paste -sd' ' -)"; fi
+  if [ "$nf" -gt 0 ]; then echo "  → brew upgrade --formula"; fi
+  if [ "$nc" -gt 0 ]; then echo "  → apps: quit them first, then brew upgrade --cask"; fi
+  if [ $((nf + nc)) -gt 0 ]; then due=$((due + nf + nc)); summary+=("$((nf + nc)) brew"); fi
+  echo
+
+  # ── mise (Node / Python) ───────────────────────────────────────────────────
+  echo "mise:"
+  mise_due=0
+  for tool in node python; do
+    current=$(mise current "$tool" 2>/dev/null | awk '{print $1}')
+    [ -z "$current" ] && continue
+    case $tool in
+      node)   line=${current%%.*} ;;                       # 22.22.0 -> 22
+      python) line=$(echo "$current" | cut -d. -f1,2) ;;   # 3.13.3 -> 3.13
+    esac
+    latest_line=$(mise latest "$tool@$line" 2>/dev/null)
+    newest=$(mise latest "$tool" 2>/dev/null)
+    if [ -n "$latest_line" ] && [ "$latest_line" != "$current" ]; then
+      echo "  $tool $current → $latest_line   (newest overall: $newest)"
+      mise_due=$((mise_due + 1))
+    else
+      echo "  $tool $current is the latest $line.x   (newest overall: $newest)"
+    fi
+  done
+  if [ "$mise_due" -gt 0 ]; then
+    due=$((due + mise_due)); summary+=("$mise_due mise")
+    echo "  → update the versions in mise/config.toml.symlink, then: mise install"
+    echo "    (reinstall global npm/pip packages for the new versions; see Brewfile npm list)"
+  fi
+  echo
+
+  # ── pre-commit hooks pinned in this repo ───────────────────────────────────
+  echo "pre-commit hooks (dotfiles):"
+  hooks_due=0
+  repos=$(grep -E '^[[:space:]]*- repo:' "$DOTFILES/.pre-commit-config.yaml" | awk '{print $3}')
+  revs=$(grep -E '^[[:space:]]*rev:' "$DOTFILES/.pre-commit-config.yaml" | awk '{print $2}')
+  while read -r repo rev; do
+    [ -z "$repo" ] && continue
+    latest=$(git ls-remote --tags --refs --sort=-v:refname "$repo" 'v*' 2>/dev/null | head -1 | sed 's|.*refs/tags/||')
+    name=${repo#https://github.com/}
+    if [ -n "$latest" ] && [ "$latest" != "$rev" ]; then
+      echo "  $name $rev → $latest"; hooks_due=$((hooks_due + 1))
+    else
+      echo "  $name $rev (latest)"
+    fi
+  done < <(paste -d' ' <(echo "$repos") <(echo "$revs"))
+  if [ "$hooks_due" -gt 0 ]; then
+    due=$((due + hooks_due)); summary+=("$hooks_due hooks")
+    echo "  → cd $DOTFILES && pre-commit autoupdate && git commit -am 'Update pre-commit hooks'"
+  fi
+  echo
+
+  if [ "$due" -eq 0 ]; then echo "Everything is up to date."; fi
+} > "$REPORT" 2>&1
+
+cat "$REPORT"
+
+if [ "${1:-}" = "--notify" ] && [ "$due" -gt 0 ]; then
+  msg=$(IFS=,; echo "${summary[*]}" | sed 's/,/, /g')
+  terminal-notifier -title "Dev upkeep" -message "Updates available: $msg. Click for details." \
+    -group dev-upkeep \
+    -execute "/Applications/kitty.app/Contents/MacOS/kitty --hold /bin/cat '$REPORT'" >/dev/null 2>&1
+fi
+exit 0

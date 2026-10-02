@@ -114,6 +114,12 @@ function sec_grp_update(){
   `which node $HOME/workspace/source-code/lightmetrics/nodejs/misc/aws-utils/src/update-sg.js` $1;
 }
 
+# *****************UPKEEP*******************
+
+# What has updates (brew, mise, pre-commit hooks)? Reports only. Also runs
+# monthly via launchd (launchd/dev.dotfiles.upkeep.plist) with a notification.
+alias upkeep='"$DOTFILES_DIR/bin/upkeep"'
+
 # *****************GIT HOOKS*******************
 
 # `pre-commit install` refuses while the global core.hooksPath is set (the

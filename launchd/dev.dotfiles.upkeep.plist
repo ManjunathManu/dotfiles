@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Monthly upkeep check (bin/upkeep): 1st of each month at 10:00, or at the
+  next wake if the Mac was asleep. Reports and notifies; never upgrades.
+  Template: install/link.sh fills in __DOTFILES__ / __HOME__, copies it to
+  ~/Library/LaunchAgents and loads it.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>dev.dotfiles.upkeep</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>__DOTFILES__/bin/upkeep</string>
+    <string>--notify</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Day</key>
+    <integer>1</integer>
+    <key>Hour</key>
+    <integer>10</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>__HOME__/.cache/upkeep/launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>__HOME__/.cache/upkeep/launchd.log</string>
+</dict>
+</plist>

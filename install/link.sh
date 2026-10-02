@@ -51,3 +51,12 @@ if [ -d "$WORK_DIR" ]; then
   # It defines a hook, so mise only runs it once trusted
   command -v mise >/dev/null 2>&1 && mise trust --quiet "$WORK_DIR/mise.toml"
 fi
+
+# Monthly upkeep check (launchd). Copied, not linked: launchd is unreliable
+# with symlinked plists. Re-running link.sh refreshes and reloads it.
+PLIST_NAME="dev.dotfiles.upkeep.plist"
+PLIST_DST="$HOME/Library/LaunchAgents/$PLIST_NAME"
+mkdir -p "$HOME/Library/LaunchAgents" "$HOME/.cache/upkeep"
+sed -e "s|__DOTFILES__|$DOTFILES|g" -e "s|__HOME__|$HOME|g" "$DOTFILES/launchd/$PLIST_NAME" > "$PLIST_DST"
+launchctl bootout "gui/$(id -u)/dev.dotfiles.upkeep" 2>/dev/null
+launchctl bootstrap "gui/$(id -u)" "$PLIST_DST" && info "Monthly upkeep check scheduled (launchd)"

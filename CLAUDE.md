@@ -86,6 +86,10 @@ zsh -n file; bash -n file            # syntax only; also dry-run scripts, it mis
 - `mise-env` (zsh) loads a repo's `.env` via an untracked `mise.local.toml` (listed in `.git/info/exclude`); `mise-env off` removes it.
 - `grep` is aliased to `rg` in zsh: use `command grep` in shell functions.
 
+### Upkeep
+
+- `bin/upkeep` (zsh alias `upkeep`) reports brew / mise / pre-commit-hook updates, never upgrades. launchd runs it with `--notify` on the 1st of each month at 10:00 (`launchd/dev.dotfiles.upkeep.plist` is a template: link.sh fills in paths, copies it to `~/Library/LaunchAgents` and reloads it). Report: `~/.cache/upkeep/report.txt`.
+
 ## Working with This Repository
 
 - Install scripts use `utils.sh`: `h1`, `h2`, `info`, `success`, `error`, `typeExists`, `runCommand`. `runCommand` runs inside `$(…)` (output hidden unless it fails), so use it for quick non-interactive steps; run interactive or long commands directly.

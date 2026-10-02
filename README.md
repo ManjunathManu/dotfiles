@@ -54,6 +54,7 @@ mise use node@20           # pin a version for this project
 mise-env                   # load this repo's .env while inside it (mise-env off)
 brew bundle check --file=Brewfile   # is everything installed?
 pre-commit run --all-files # gitleaks + shellcheck on this repo
+upkeep                     # what has updates? (also runs monthly with a notification)
 ```
 
 ## Layout
