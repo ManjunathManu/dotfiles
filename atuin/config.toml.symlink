@@ -1,0 +1,30 @@
+# atuin: searchable shell history (Ctrl+R; `/` in vi normal mode).
+# Linked to ~/.config/atuin/config.toml by install/link.sh.
+# Initialized in zshrc with --disable-up-arrow --disable-ai.
+# Full reference: https://docs.atuin.sh/configuration/config/
+
+# Local only: no account, nothing leaves this Mac. To sync between machines
+# later: `atuin register` / `atuin login`, then set auto_sync = true.
+auto_sync = false
+update_check = false          # updates come from brew
+
+# Search
+search_mode = "fuzzy"
+filter_mode = "global"        # Ctrl+R cycles: global → host → session → directory
+workspaces = true             # inside a git repo, "workspace" filter = this repo
+style = "compact"
+inline_height = 20            # open below the prompt, not fullscreen
+show_preview = true           # full command for long one-liners
+keymap_mode = "auto"          # follow zsh's vi mode (insert/normal)
+
+# Picking a result puts it on the prompt to review/edit; Enter again runs it.
+# Safer than running immediately when prod credentials are loaded.
+enter_accept = false
+
+# Never save these (on top of the built-in secrets filter for AWS keys,
+# GitHub/Slack tokens, etc.)
+secrets_filter = true
+history_filter = [
+  "^export (AWS_|.*TOKEN|.*SECRET|.*PASSWORD)",
+  "^ ",                       # leading space = don't record (like HIST_IGNORE_SPACE)
+]

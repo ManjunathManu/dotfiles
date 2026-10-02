@@ -22,6 +22,7 @@ brew "bash-completion@2"
 brew "bash-completion", link: false
 brew "fzf"
 brew "zoxide"             # smart cd
+brew "atuin"              # searchable shell history (atuin/config.toml.symlink)
 brew "tmux"               # ⚠ replaced by kitty; remove once you no longer need it as a fallback
 
 # ── Modern CLI replacements ──────────────────────────────────────────────────

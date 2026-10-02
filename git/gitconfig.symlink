@@ -73,12 +73,65 @@
     line-numbers-zero-style       = "#595959"
 
 [merge]
-    conflictstyle = diff3
+    # Like diff3 (shows the common ancestor), minus lines both sides share
+    conflictstyle = zdiff3
 
 [diff]
     colorMoved = default
+    colorMovedWS = allow-indentation-change
+    # Better diffs for moved/reordered code than the default myers
+    algorithm = histogram
     # Use delta for git diff
     tool = delta
+
+[pull]
+    # Rebase local commits on top instead of creating merge commits
+    rebase = true
+
+[rebase]
+    # Stash/unstash a dirty tree around rebases automatically
+    autoStash = true
+    # `git commit --fixup <sha>` commits get squashed into place on rebase -i
+    autoSquash = true
+    # Move stacked branches along when rebasing the branch below them
+    updateRefs = true
+
+[rerere]
+    # Remember how a conflict was resolved and reuse it next time
+    enabled = true
+    autoUpdate = true
+
+[push]
+    # First push of a new branch sets its upstream (no --set-upstream)
+    autoSetupRemote = true
+    followTags = true
+
+[fetch]
+    # Drop local refs to branches deleted on the remote
+    prune = true
+
+[commit]
+    # Show the diff in the editor while writing the message
+    verbose = true
+
+[branch]
+    # `git branch` lists most recently used first
+    sort = -committerdate
+
+[tag]
+    sort = version:refname
+
+[help]
+    # Typo'd command: suggest the fix and ask before running it
+    autocorrect = prompt
+
+# Commit signing with SSH keys. Which key, and whether to sign, is per
+# machine: set in ~/.gitconfig.local (install/git.sh offers to configure it).
+[gpg]
+    format = ssh
+[gpg "ssh"]
+    # Lets `git log --show-signature` verify signatures locally
+    allowedSignersFile = ~/.config/git/allowed_signers
 
 [pager]
     diff = delta
@@ -99,6 +152,4 @@
     tree = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
 [init]
 	defaultBranch = main
-[user]
-	name = Manjunath
-	email = manjunath.manu@lightmetrics.co
+# [user] name/email live in ~/.gitconfig.local (written by install/git.sh)

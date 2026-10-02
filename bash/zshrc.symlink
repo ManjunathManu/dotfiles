@@ -364,3 +364,12 @@ fi
 if [ -f ~/.enhanced_zsh ]; then
     source ~/.enhanced_zsh
 fi
+
+# atuin: searchable history on Ctrl+R (and `/` in vi normal mode). Must stay
+# after ~/.enhanced_zsh, which loads fzf's Ctrl+R binding; the last one wins.
+# --disable-up-arrow: Up keeps zsh's normal behavior.
+# --disable-ai: `?` stays a normal key (atuin AI sends input to a web service).
+# Config: atuin/config.toml.symlink
+if (( $+commands[atuin] )); then
+    eval "$(atuin init zsh --disable-up-arrow --disable-ai)"
+fi
