@@ -85,7 +85,7 @@ confirm_os_window_close -1
 
 tab_bar_edge        top
 # custom = tab_bar.py: powerline tabs (left) + status segments (right):
-# AWS (sso) · load · local IP · UTC timestamp
+# load · local IP · UTC timestamp (AWS sso account is in the Starship prompt)
 # Edit SEGMENTS in tab_bar.py to hide or reorder. Set back to `powerline` to disable.
 tab_bar_style       custom
 tab_powerline_style slanted
